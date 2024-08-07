@@ -3,7 +3,7 @@ import { Button, Input } from "@rneui/base";
 import { useState } from "react";
 
 
-export default function cadastroScreen() {
+export default function LoginScreen() {
   const [value, setValue] = useState('')
 
   const handleInputChange = (text: string) => {
@@ -14,21 +14,15 @@ export default function cadastroScreen() {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/images/react-logo.png')} />
-      <Text style={styles.cadastroTexto}> Cadastro </Text>
-      <Text style={styles.informe}>Informe os seus dados {'\n'}para prosseguir com o cadastro</Text>
+      <Text style={styles.loginTexto}> Login </Text>
       <View style={styles.campoForm}>
         <Input
-          placeholder='Informe seu nome completo' inputStyle={styles.inputLabel} label='Nome' labelStyle={styles.labelForm}
+          placeholder='Digite seu email' inputStyle={styles.inputLabel} label='Email' labelStyle={styles.labelForm}
         />
         <Input
-          placeholder='Seu número com DDD' inputStyle={styles.inputLabel} keyboardType="numeric" onChangeText={handleInputChange} label='Telefone' labelStyle={styles.labelForm}
+          placeholder='Digite sua senha' inputStyle={styles.inputLabel} label='Senha' labelStyle={styles.labelForm}
         />
-        <Input
-          placeholder='Informe o email aqui' inputStyle={styles.inputLabel} label='Email' labelStyle={styles.labelForm}
-        />
-
-        <Button title={'Cadastrar como Lojista'} titleStyle={styles.titleLojista} buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }} containerStyle={styles.containerForm} />
-        <Button title={'Cadastrar como Entregador'} titleStyle={styles.titleEntregador} buttonStyle={{ backgroundColor: '#fff', borderRadius: 5}} containerStyle={styles.containerForm} />
+        <Button title={'Entrar'} titleStyle={styles.titleLojista} buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }} containerStyle={styles.containerForm} />
       </View>
     </View>
   );
@@ -41,7 +35,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cadastroTexto: {
+  loginTexto: {
     color: "#fff",
     fontSize: 30,
     fontWeight: "600"

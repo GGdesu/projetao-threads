@@ -11,7 +11,7 @@ export default function Index() {
       <Text style={styles.texto}>Otimizando</Text>
       <Text style={styles.textoNegrito}>Entregas</Text>
 
-      <TouchableOpacity style={styles.entrarB} onPress={() => router.navigate('/cadastro')}>
+      <TouchableOpacity style={styles.entrarB} onPress={() => router.navigate('/login')}>
         <Text style={styles.textoEntrar}>Entrar</Text>
       </TouchableOpacity>
 
@@ -21,7 +21,7 @@ export default function Index() {
         </TouchableOpacity>
       </Link> */}
 
-      <TouchableOpacity style={styles.cadastroB}>
+      <TouchableOpacity style={styles.cadastroB} onPress={() => router.navigate('/cadastro')}>
         <Text style={styles.textoCadastro}>Cadastrar</Text>
       </TouchableOpacity>
     </View>
