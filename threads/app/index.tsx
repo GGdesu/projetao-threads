@@ -1,5 +1,4 @@
 import { Text, View, StyleSheet, Image, Button, TouchableOpacity } from "react-native";
-import { Border, Color, FontFamily, FontSize } from "../constants/GlobalStyles";
 import { Link, useRouter } from "expo-router";
 
 export default function Index() {
