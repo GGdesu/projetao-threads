@@ -5,11 +5,40 @@ import { useState } from "react";
 
 export default function cadastroScreen() {
   const [value, setValue] = useState('')
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const handleInputChange = (text: string) => {
     const numericValue = text.replace(/[^0-9]/g, '')
     setValue(numericValue)
   }
+
+  // Função de validação de email
+  const validateEmail = (text: string) => {
+    setEmail(text);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(text)) {
+      setEmailError('Email inválido');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  // Função de validação de senha
+  const validatePassword = (text: string) => {
+    setPassword(text);
+
+    // Verifica se a senha atende aos critérios
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
+
+    if (!passwordRegex.test(text)) {
+      setPasswordError('A senha deve ter no mínimo 8 caracteres, incluindo uma letra maiúscula, uma minúscula e um símbolo.');
+    } else {
+      setPasswordError('');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -18,17 +47,48 @@ export default function cadastroScreen() {
       <Text style={styles.informe}>Informe os seus dados {'\n'}para prosseguir com o cadastro</Text>
       <View style={styles.campoForm}>
         <Input
-          placeholder='Informe seu nome completo' inputStyle={styles.inputLabel} label='Nome' labelStyle={styles.labelForm}
+          placeholder='Informe seu nome completo'
+          inputStyle={styles.inputLabel}
+          label='Nome'
+          labelStyle={styles.labelForm}
         />
         <Input
-          placeholder='Seu número com DDD' inputStyle={styles.inputLabel} keyboardType="numeric" onChangeText={handleInputChange} label='Telefone' labelStyle={styles.labelForm}
+          placeholder='Seu número com DDD'
+          inputStyle={styles.inputLabel}
+          keyboardType="numeric"
+          onChangeText={handleInputChange}
+          label='Telefone'
+          labelStyle={styles.labelForm}
         />
         <Input
-          placeholder='Informe o email aqui' inputStyle={styles.inputLabel} label='Email' labelStyle={styles.labelForm}
+          placeholder='Informe o email aqui'
+          inputStyle={styles.inputLabel}
+          label='Email'
+          labelStyle={styles.labelForm}
+          onChangeText={validateEmail}
+          errorMessage={emailError}
+        />
+        <Input
+          placeholder='Insira uma senha'
+          inputStyle={styles.inputLabel}
+          onChangeText={validatePassword}
+          errorMessage={passwordError}
+          label='Criar Senha'
+          labelStyle={styles.labelForm}
+          secureTextEntry={true}
+        />
+        <Input
+          placeholder='Insira a senha novamente'
+          inputStyle={styles.inputLabel}
+          onChangeText={validatePassword}
+          errorMessage={passwordError}
+          label='Repetir a senha'
+          labelStyle={styles.labelForm}
+          secureTextEntry={true}
         />
 
         <Button title={'Cadastrar como Lojista'} titleStyle={styles.titleLojista} buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }} containerStyle={styles.containerForm} />
-        <Button title={'Cadastrar como Entregador'} titleStyle={styles.titleEntregador} buttonStyle={{ backgroundColor: '#fff', borderRadius: 5}} containerStyle={styles.containerForm} />
+        <Button title={'Cadastrar como Entregador'} titleStyle={styles.titleEntregador} buttonStyle={{ backgroundColor: '#fff', borderRadius: 5 }} containerStyle={styles.containerForm} />
       </View>
     </View>
   );

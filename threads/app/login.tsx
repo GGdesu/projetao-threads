@@ -17,10 +17,17 @@ export default function LoginScreen() {
       <Text style={styles.loginTexto}> Login </Text>
       <View style={styles.campoForm}>
         <Input
-          placeholder='Digite seu email' inputStyle={styles.inputLabel} label='Email' labelStyle={styles.labelForm}
+          placeholder='Digite seu email'
+          inputStyle={styles.inputLabel}
+          label='Email'
+          labelStyle={styles.labelForm}
         />
         <Input
-          placeholder='Digite sua senha' inputStyle={styles.inputLabel} label='Senha' labelStyle={styles.labelForm}
+          placeholder='Digite sua senha'
+          inputStyle={styles.inputLabel}
+          secureTextEntry={true}
+          label='Senha'
+          labelStyle={styles.labelForm}
         />
         <Button title={'Entrar'} titleStyle={styles.titleLojista} buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }} containerStyle={styles.containerForm} />
       </View>
