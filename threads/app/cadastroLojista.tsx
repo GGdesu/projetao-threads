@@ -1,11 +1,11 @@
-import { Text, View, StyleSheet, Image } from "react-native";
+import { ScrollView, Text, View, StyleSheet, Image } from "react-native";
 import { Button, Input } from "@rneui/base";
 import { useState } from "react";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 export default function cadastroScreen() {
-    const router = useRouter();
     const [value, setValue] = useState("");
+    const router = useRouter();
 
     const handleInputChange = (text: string) => {
         const numericValue = text.replace(/[^0-9]/g, "");
@@ -13,21 +13,34 @@ export default function cadastroScreen() {
     };
 
     return (
-        <View style={styles.container}>
-            <Image source={require("../assets/images/react-logo.png")} />
-            <Text style={styles.cadastroTexto}> Cadastro </Text>
+        <ScrollView contentContainerStyle={styles.scrollView}>
+            <Text style={styles.cadastroTexto}> Cadastro Lojista </Text>
             <Text style={styles.informe}>
                 Informe os seus dados {"\n"}para prosseguir com o cadastro
             </Text>
             <View style={styles.campoForm}>
                 <Input
-                    placeholder="Informe seu nome completo"
+                    placeholder="Informe o nome da loja"
                     inputStyle={styles.inputLabel}
                     label="Nome"
                     labelStyle={styles.labelForm}
                 />
                 <Input
-                    placeholder="Seu número com DDD"
+                    placeholder="Informe seu CNPJ"
+                    inputStyle={styles.inputLabel}
+                    keyboardType="numeric"
+                    onChangeText={handleInputChange}
+                    label="CNPJ"
+                    labelStyle={styles.labelForm}
+                />
+                <Input
+                    placeholder="Informe seu Endereço"
+                    inputStyle={styles.inputLabel}
+                    label="Endereço"
+                    labelStyle={styles.labelForm}
+                />
+                <Input
+                    placeholder="Informe seu Telefone"
                     inputStyle={styles.inputLabel}
                     keyboardType="numeric"
                     onChangeText={handleInputChange}
@@ -35,38 +48,25 @@ export default function cadastroScreen() {
                     labelStyle={styles.labelForm}
                 />
                 <Input
-                    placeholder="Informe o email aqui"
+                    placeholder="Informe sua Conta Bancaria"
                     inputStyle={styles.inputLabel}
-                    label="Email"
+                    label="Conta Bancária"
                     labelStyle={styles.labelForm}
                 />
-
                 <Button
-                    title={"Cadastrar como Lojista"}
-                    titleStyle={styles.titleLojista}
-                    buttonStyle={{
-                        backgroundColor: "#808080",
-                        borderRadius: 5,
-                    }}
-                    containerStyle={styles.containerForm}
-                    onPress={() => router.navigate("/cadastroLojista")}
-                />
-                <Button
-                    title={"Cadastrar como Entregador"}
+                    title={"Finalizar Cadastro"}
                     titleStyle={styles.titleEntregador}
                     buttonStyle={{ backgroundColor: "#fff", borderRadius: 5 }}
                     containerStyle={styles.containerForm}
-                    onPress={() => router.navigate("/cadastroEntregador")}
                 />
             </View>
-        </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
+    scrollView: {
+        flexGrow: 1,
         justifyContent: "center",
         alignItems: "center",
     },
@@ -99,10 +99,6 @@ const styles = StyleSheet.create({
         lineHeight: 16,
         textAlign: "left",
         color: "#b3b3b3",
-    },
-    titleLojista: {
-        fontSize: 16,
-        color: "#fff",
     },
     containerForm: {
         padding: 5,
