@@ -1,6 +1,7 @@
-import { Text, View, StyleSheet, Image } from "react-native";
+import { Text, View, StyleSheet, Image, Alert } from "react-native";
 import { Button, Input } from "@rneui/base";
 import { useState } from "react";
+import { supabase } from "@/utils/supabase";
 
 
 export default function cadastroScreen() {
@@ -9,6 +10,7 @@ export default function cadastroScreen() {
   const [emailError, setEmailError] = useState('');
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (text: string) => {
     const numericValue = text.replace(/[^0-9]/g, '')
@@ -21,8 +23,10 @@ export default function cadastroScreen() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(text)) {
       setEmailError('Email inválido');
+      
     } else {
       setEmailError('');
+      
     }
   };
 
@@ -39,6 +43,30 @@ export default function cadastroScreen() {
       setPasswordError('');
     }
   };
+
+  const comparePassword = (text: string) => {
+    if (password != text) {
+      setPasswordError('A senha não está igual')
+    } else {
+      setPasswordError('')
+    }
+  }
+
+  async function signUpWithEmail() {
+    setLoading(true)
+
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    })
+
+    if (error) Alert.alert(error.message)
+    if (!session) Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
+    setLoading(false)
+  }
 
   return (
     <View style={styles.container}>
@@ -67,6 +95,7 @@ export default function cadastroScreen() {
           labelStyle={styles.labelForm}
           onChangeText={validateEmail}
           errorMessage={emailError}
+          autoCapitalize={'none'}
         />
         <Input
           placeholder='Insira uma senha'
@@ -76,19 +105,31 @@ export default function cadastroScreen() {
           label='Criar Senha'
           labelStyle={styles.labelForm}
           secureTextEntry={true}
+          autoCapitalize={'none'}
         />
         <Input
           placeholder='Insira a senha novamente'
           inputStyle={styles.inputLabel}
-          onChangeText={validatePassword}
+          onChangeText={comparePassword}
           errorMessage={passwordError}
           label='Repetir a senha'
           labelStyle={styles.labelForm}
           secureTextEntry={true}
+          autoCapitalize={'none'}
         />
 
-        <Button title={'Cadastrar como Lojista'} titleStyle={styles.titleLojista} buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }} containerStyle={styles.containerForm} />
-        <Button title={'Cadastrar como Entregador'} titleStyle={styles.titleEntregador} buttonStyle={{ backgroundColor: '#fff', borderRadius: 5 }} containerStyle={styles.containerForm} />
+        <Button title={'Cadastrar como Lojista'}
+          disabled={loading}
+          onPress={() => signUpWithEmail()}
+          titleStyle={styles.titleLojista}
+          buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }}
+          containerStyle={styles.containerForm} />
+        <Button title={'Cadastrar como Entregador'}
+          disabled={loading}
+          onPress={() => signUpWithEmail()}
+          titleStyle={styles.titleEntregador}
+          buttonStyle={{ backgroundColor: '#fff', borderRadius: 5 }}
+          containerStyle={styles.containerForm} />
       </View>
     </View>
   );
