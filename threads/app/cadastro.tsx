@@ -12,10 +12,10 @@ export default function cadastroScreen() {
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (text: string) => {
-    const numericValue = text.replace(/[^0-9]/g, '')
-    setValue(numericValue)
-  }
+    const handleInputChange = (text: string) => {
+        const numericValue = text.replace(/[^0-9]/g, "");
+        setValue(numericValue);
+    };
 
   // Função de validação de email
   const validateEmail = (text: string) => {
@@ -136,53 +136,52 @@ export default function cadastroScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cadastroTexto: {
-    color: "#fff",
-    fontSize: 30,
-    fontWeight: "600"
-  },
-  informe: {
-    fontSize: 16,
-    color: '#808080',
-    textAlign: "center",
-    marginBottom: 20
-  },
-  campoForm: {
-    width: "90%",
-    backgroundColor: "#000",
-    paddingVertical: 30,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-  },
-  labelForm: {
-    color: '#b3b3b3',
-    textAlign: 'left',
-    fontSize: 16,
-    lineHeight: 22,
-    width: "100%",
-  },
-  inputLabel: {
-    lineHeight: 16,
-    textAlign: 'left',
-    color: '#b3b3b3',
-  },
-  titleLojista: {
-    fontSize: 16,
-    color: '#fff',
-  },
-  containerForm: {
-    padding: 5,
-  },
-  titleEntregador: {
-    color: '#000',
-    fontSize: 16,
-    //backgroundColor: Color.colorBlack,
-
-  },
-})
+    container: {
+        flex: 1,
+        backgroundColor: "#fff",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    cadastroTexto: {
+        color: "#000",
+        fontSize: 30,
+        fontWeight: "600",
+    },
+    informe: {
+        fontSize: 16,
+        color: "#808080",
+        textAlign: "center",
+        marginBottom: 20,
+    },
+    campoForm: {
+        width: "90%",
+        backgroundColor: "#000",
+        paddingVertical: 30,
+        paddingHorizontal: 10,
+        borderRadius: 10,
+    },
+    labelForm: {
+        color: "#b3b3b3",
+        textAlign: "left",
+        fontSize: 16,
+        lineHeight: 22,
+        width: "100%",
+    },
+    inputLabel: {
+        lineHeight: 16,
+        textAlign: "left",
+        color: "#b3b3b3",
+    },
+    titleLojista: {
+        fontSize: 16,
+        color: "#fff",
+    },
+    containerForm: {
+        padding: 5,
+    },
+    titleEntregador: {
+        color: "#000",
+        fontSize: 16,
+        //backgroundColor: Color.colorBlack,
+    },
+});
