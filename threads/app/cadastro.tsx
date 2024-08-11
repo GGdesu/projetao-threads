@@ -2,15 +2,17 @@ import { Text, View, StyleSheet, Image, Alert } from "react-native";
 import { Button, Input } from "@rneui/base";
 import { useState } from "react";
 import { supabase } from "@/utils/supabase";
+import { useRouter } from "expo-router";
 
 
 export default function cadastroScreen() {
   const [value, setValue] = useState('')
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
     const handleInputChange = (text: string) => {
         const numericValue = text.replace(/[^0-9]/g, "");
@@ -120,13 +122,15 @@ export default function cadastroScreen() {
 
         <Button title={'Cadastrar como Lojista'}
           disabled={loading}
-          onPress={() => signUpWithEmail()}
+          //onPress={() => signUpWithEmail()}
+          onPress={() => router.navigate("/cadastroLojista")}
           titleStyle={styles.titleLojista}
           buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }}
           containerStyle={styles.containerForm} />
         <Button title={'Cadastrar como Entregador'}
           disabled={loading}
-          onPress={() => signUpWithEmail()}
+          onPress={() => router.navigate("/cadastroEntregador")}
+          //onPress={() => signUpWithEmail()} //criação de email
           titleStyle={styles.titleEntregador}
           buttonStyle={{ backgroundColor: '#fff', borderRadius: 5 }}
           containerStyle={styles.containerForm} />
