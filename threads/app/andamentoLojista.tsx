@@ -71,7 +71,6 @@ export default function CorridasEmAndamento() {
             {session && session.user ? (
             <View style={styles.container}>
                 {/* Cabeçalho do Restaurante */}
-                <Text>{ session.user.id}</Text>
                 <View style={styles.header}>
                     <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
                     <View>

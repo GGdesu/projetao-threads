@@ -10,6 +10,7 @@ export default function cadastroScreen() {
     const { email, password } = useLocalSearchParams();
     //const [loading, setLoading] = useState(false)
 
+    //inputs do usuario
     const [nomeLoja, setNomeLoja] = useState("")
     const [cnpj, setCnpj] = useState("")
     const [endereco, setEndereco] = useState("")
@@ -68,6 +69,7 @@ export default function cadastroScreen() {
                 .insert([
                     {
                         user_id: user?.id,
+                        tipo_usuario: 1,
                         nome_loja: nomeLoja,
                         cnpj: parseInt(cnpj),
                         endereco: endereco,
@@ -79,12 +81,13 @@ export default function cadastroScreen() {
             if (insertError) {
                 Alert.alert('Erro ao salvar informações adicionais:', insertError.message)
             }else{
-                Alert.alert("informaçoes salvas")
+                Alert.alert("informaçoes salvas, por favor faça login")
+                router.navigate("/login")
             }
 
             if (!session) {
                 Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
-                router.navigate("/login")
+                //router.navigate("/login")
             }
             //setLoading(false)
 
