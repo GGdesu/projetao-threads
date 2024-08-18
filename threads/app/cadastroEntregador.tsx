@@ -1,22 +1,45 @@
-import { ScrollView, Text, View, StyleSheet, Image } from "react-native";
+import { ScrollView, Text, View, StyleSheet, Image, Alert } from "react-native";
 import { Button, Input } from "@rneui/base";
 import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { supabase } from "@/utils/supabase";
 
 
 export default function cadastroScreen() {
   const [value, setValue] = useState('')
   const router = useRouter()
+  const {email, password} = useLocalSearchParams();
+  //const [loading, setLoading] = useState(false)
+
+  // Certificar de que o email e a senha sejam strings
+  const emailString = Array.isArray(email) ? email[0] : email;
+  const passwordString = Array.isArray(password) ? password[0] : password;
 
   const handleInputChange = (text: string) => {
     const numericValue = text.replace(/[^0-9]/g, '')
     setValue(numericValue)
   }
 
+  async function signUpWithEmail() {
+    //setLoading(true)
+
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email: emailString,
+      password: passwordString,
+    })
+
+    if (error) Alert.alert(error.message)
+    if (!session) Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
+    //setLoading(false)
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>
       <Text style={styles.cadastroTexto}> Cadastro Entregador </Text>
-      <Text style={styles.informe}>Informe os seus dados {'\n'}para prosseguir com o cadastro</Text>    
+      <Text style={styles.informe}>Informe os seus dados {'\n'}para prosseguir com o cadastro</Text>
       <View style={styles.campoForm}>
         <Input
           placeholder='Informe seu nome completo' inputStyle={styles.inputLabel} label='Nome' labelStyle={styles.labelForm}
@@ -42,19 +65,19 @@ export default function cadastroScreen() {
         <Input
           placeholder='Informe seu Veiculo (moto/bicicleta)' inputStyle={styles.inputLabel} label='Veículo' labelStyle={styles.labelForm}
         />
-        
-        <Button title={'Finalizar Cadastro'} titleStyle={styles.titleEntregador} buttonStyle={{ backgroundColor: '#fff', borderRadius: 5}} containerStyle={styles.containerForm} />
+
+        <Button title={'Finalizar Cadastro'} titleStyle={styles.titleEntregador} buttonStyle={{ backgroundColor: '#fff', borderRadius: 5 }} containerStyle={styles.containerForm} />
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-   scrollView: {
+  scrollView: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    },  
+  },
   cadastroTexto: {
     color: "#000",
     fontSize: 30,
@@ -71,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     paddingVertical: 30,
     paddingHorizontal: 10,
-    borderRadius: 10,     
+    borderRadius: 10,
   },
   labelForm: {
     color: '#b3b3b3',
@@ -84,7 +107,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     textAlign: 'left',
     color: '#b3b3b3',
-  },  
+  },
   containerForm: {
     padding: 5,
   },

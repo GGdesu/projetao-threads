@@ -2,6 +2,7 @@ import { Text, View, StyleSheet, Image, Alert } from "react-native";
 import { Button, Input } from "@rneui/base";
 import { useState } from "react";
 import { supabase } from "@/utils/supabase";
+import { router } from "expo-router";
 
 
 export default function LoginScreen() {
@@ -10,14 +11,25 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false)
 
   async function signInWithEmail() {
-    setLoading(true)
-    const {error} = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    })
+    try {
+      setLoading(true)
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      })
 
-    if (error) Alert.alert(error.message)
-      setLoading(false)
+      if (error) {
+        Alert.alert(error.message)
+        setLoading(false)
+      } else {
+        console.log("autenticado, indo para a tela inicial")
+        router.push("/andamentoLojista")
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+
   }
 
   return (
@@ -44,11 +56,11 @@ export default function LoginScreen() {
           labelStyle={styles.labelForm}
         />
         <Button title={'Entrar'}
-        disabled={loading}
-        onPress={() => signInWithEmail()}
-        titleStyle={styles.titleLojista} 
-        buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }} 
-        containerStyle={styles.containerForm} />
+          disabled={loading}
+          onPress={() => signInWithEmail()}
+          titleStyle={styles.titleLojista}
+          buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }}
+          containerStyle={styles.containerForm} />
       </View>
     </View>
   );

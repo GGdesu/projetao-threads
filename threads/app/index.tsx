@@ -12,7 +12,7 @@ export default function Index() {
 
             <TouchableOpacity
                 style={styles.entrarB}
-                onPress={() => router.navigate("/andamentoLojista")}
+                onPress={() => router.navigate("/login")}
             >
                 <Text style={styles.textoEntrar}>Entrar</Text>
             </TouchableOpacity>

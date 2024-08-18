@@ -1,10 +1,35 @@
-import React, { useState } from 'react';
+import { supabase } from '@/utils/supabase';
+import { Session } from '@supabase/supabase-js';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import LoginScreen from './login';
 
-export default function CorridasEmAndamento({ navigation }) {
+interface Corrida {
+    id: string;
+    entregador: string;
+    coleta: string;
+    previsaoEntrega: string;
+    atrasada: boolean;
+  }
+
+export default function CorridasEmAndamento() {
+    const router = useRouter()
     const [filtro, setFiltro] = useState('Todas');
 
-    const corridas = [
+    const [session, setSession] = useState<Session | null>(null);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session)
+        })
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session)
+        })
+    }, [])
+
+    const corridas: Corrida[] = [
         {
             id: '1',
             entregador: 'José',
@@ -26,9 +51,12 @@ export default function CorridasEmAndamento({ navigation }) {
         filtro === 'Todas' || (filtro === 'Atrasadas' && corrida.atrasada)
     );
 
-    const renderCorrida = ({ item }) => (
+    const renderCorrida = ({ item }: {item: Corrida}) => (
         <TouchableOpacity style={[styles.card, item.atrasada && styles.cardAtrasada]}
-            onPress={() => navigation.navigate('DetalhesCorrida', { corridaId: item.id })}>
+            onPress={() => router.push({
+                pathname: "/detalheAndamentoLojista",
+                params: { corridaId: item.id }
+            })}>
             <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />
             <View style={styles.cardInfo}>
                 <Text style={styles.entregadorNome}>Entregador: <Text style={styles.boldText}>{item.entregador}</Text></Text>
@@ -39,40 +67,45 @@ export default function CorridasEmAndamento({ navigation }) {
     );
 
     return (
-        <View style={styles.container}>
-            {/* Cabeçalho do Restaurante */}
-            <View style={styles.header}>
-                <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
-                <View>
-                    <Text style={styles.restauranteNome}>Restaurante ABC</Text>
-                    <Text style={styles.restauranteLocalizacao}>Localização</Text>
+        <>
+            {session && session.user ? (
+            <View style={styles.container}>
+                {/* Cabeçalho do Restaurante */}
+                <Text>{ session.user.id}</Text>
+                <View style={styles.header}>
+                    <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
+                    <View>
+                        <Text style={styles.restauranteNome}>Restaurante ABC</Text>
+                        <Text style={styles.restauranteLocalizacao}>Localização</Text>
+                    </View>
                 </View>
-            </View>
 
-            <Text style={{textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold'}}>Corridas Em andamento</Text>
-            {/* Filtros */}
-            <View style={styles.filtros}>
-                
-                <TouchableOpacity
-                    style={[styles.filtroButton, filtro === 'Todas' && styles.filtroButtonAtivo]}
-                    onPress={() => setFiltro('Todas')}>
-                    <Text style={filtro === 'Todas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Todas</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.filtroButton, filtro === 'Atrasadas' && styles.filtroButtonAtivo]}
-                    onPress={() => setFiltro('Atrasadas')}>
-                    <Text style={filtro === 'Atrasadas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Atrasadas</Text>
-                </TouchableOpacity>
-            </View>
+                <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
+                {/* Filtros */}
+                <View style={styles.filtros}>
 
-            {/* Lista de Corridas */}
-            <FlatList
-                data={corridasFiltradas}
-                renderItem={renderCorrida}
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.listaCorridas}
-            />
-        </View>
+                    <TouchableOpacity
+                        style={[styles.filtroButton, filtro === 'Todas' && styles.filtroButtonAtivo]}
+                        onPress={() => setFiltro('Todas')}>
+                        <Text style={filtro === 'Todas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Todas</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.filtroButton, filtro === 'Atrasadas' && styles.filtroButtonAtivo]}
+                        onPress={() => setFiltro('Atrasadas')}>
+                        <Text style={filtro === 'Atrasadas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Atrasadas</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Lista de Corridas */}
+                <FlatList
+                    data={corridasFiltradas}
+                    renderItem={renderCorrida}
+                    keyExtractor={item => item.id}
+                    contentContainerStyle={styles.listaCorridas}
+                />
+            </View>
+            ) : (<LoginScreen />)}
+        </>
     );
 }
 
