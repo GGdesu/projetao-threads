@@ -54,21 +54,21 @@ export default function cadastroScreen() {
     }
   }
 
-  async function signUpWithEmail() {
-    setLoading(true)
+  // async function signUpWithEmail() {
+  //   setLoading(true)
 
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
+  //   const {
+  //     data: { session },
+  //     error,
+  //   } = await supabase.auth.signUp({
+  //     email: email,
+  //     password: password,
+  //   })
 
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
-    setLoading(false)
-  }
+  //   if (error) Alert.alert(error.message)
+  //   if (!session) Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
+  //   setLoading(false)
+  // }
 
   return (
     <View style={styles.container}>
