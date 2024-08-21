@@ -16,7 +16,7 @@ interface Shopkeeper {
 }
 
 // Importando a imagem de perfil localmente com caminho relativo
-const profilePicture = require('C:/Users/Diogo/Desktop/projetao-threads/threads/assets/images/shopkeeper.jpg');
+const profilePicture = require('@/assets/images/shopkeeper.jpg');
 
 const ShopkeeperProfileScreen: React.FC = ({ navigation }) => {
   const shopkeeper: Shopkeeper = {
