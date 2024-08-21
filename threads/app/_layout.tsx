@@ -8,6 +8,7 @@ export default function RootLayout() {
       <Stack.Screen name="cadastro" options={{headerShown: false,}}/>
       <Stack.Screen name="andamentoLojista" options={{headerShown: false,}}/>
       <Stack.Screen name="detalheAndamentoLojista" options={{headerShown: false,}}/>
+      <Stack.Screen name="telaInicial" options={{headerShown: false,}}/>
     </Stack>
   );
 }

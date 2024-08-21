@@ -68,7 +68,7 @@ export default function cadastroScreen() {
                 .from('usuario')
                 .insert([
                     {
-                        user_id: user?.id,
+                        lojista_id: user?.id,
                         tipo_usuario: 1,
                         nome_loja: nomeLoja,
                         cnpj: parseInt(cnpj),
@@ -107,7 +107,7 @@ export default function cadastroScreen() {
                 <Input
                     placeholder="Informe o nome da loja"
                     inputStyle={styles.inputLabel}
-                    label="Nome"
+                    label="Nome do estabelecimento"
                     labelStyle={styles.labelForm}
                     onChangeText={handleNomeLojaChange}
                     value={nomeLoja}

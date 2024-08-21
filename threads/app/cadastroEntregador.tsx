@@ -83,7 +83,7 @@ export default function cadastroScreen() {
             .from('usuario')
             .insert([
                 {
-                    user_id: user?.id,
+                    entregador_id: user?.id,
                     tipo_usuario: 2,
                     rg: parseInt(rg),
                     data_nascimento: dataNascimento,
