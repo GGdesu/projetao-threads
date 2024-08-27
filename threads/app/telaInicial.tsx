@@ -2,24 +2,20 @@ import { supabase } from '@/utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import LoginScreen from './login';
 import { getActiveUser, getActiveUserData } from '@/utils/supabaseUtils';
+import { Corrida, UserData } from '@/utils/dataInterface';
 
-interface Corrida {
-    id: string;
-    entregador: string;
-    coleta: string;
-    previsaoEntrega: string;
-    atrasada: boolean;
-}
 
-export default function CorridasEmAndamento() {
+
+export default function TelaInicial() {
     const router = useRouter()
 
     const [filtro, setFiltro] = useState('Todas');
-    const [userData, setUserData] = useState<any[] | null>(null);
+    const [userData, setUserData] = useState<UserData | null>(null);
     const [session, setSession] = useState<Session | null>(null);
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -29,9 +25,13 @@ export default function CorridasEmAndamento() {
         supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session)
         })
-
         getUser()
     }, [])
+
+    // if (loading) {
+    //     console.log("tela de loading")
+    //     return <ActivityIndicator size={"large"} color={"0000ff"} />
+    // }
 
     const corridas: Corrida[] = [
         {
@@ -56,15 +56,20 @@ export default function CorridasEmAndamento() {
         try {
 
             const userData = await getActiveUserData()
+            if (!userData) {
+                console.log("erro ao pegar dados do usuario")
+                return null
+            }
+
             if (userData) {
-                setUserData(userData);
-            } else {
-                setUserData(null);
+                setUserData(userData)
             }
             console.log(userData)
+            //setLoading(false)
 
         } catch (error) {
             console.log(error)
+            return null
         }
 
     }
@@ -99,7 +104,12 @@ export default function CorridasEmAndamento() {
 
                         <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
                         <View>
-                            <Text style={styles.restauranteNome}>Restaurante ABC</Text>
+                            <Text style={styles.restauranteNome}>
+                                {userData && userData?.tipo_usuario === 1 && userData?.nome_loja
+                                    ? userData.nome_loja
+                                    : userData && userData?.tipo_usuario === 2 && userData?.nome
+                                    ? userData.nome : "Nome indisponível"}
+                            </Text>
                             <Text style={styles.restauranteLocalizacao}>Localização</Text>
                         </View>
                     </View>

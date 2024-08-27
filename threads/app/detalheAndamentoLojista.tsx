@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 
 export default function DetalhesDaCorrida() {
 
@@ -27,7 +27,7 @@ export default function DetalhesDaCorrida() {
             </View>
 
             {/* Seção de Previsão */}
-            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <Text style={styles.subTitle}>Previsão: 23:02</Text>
                 <View style={styles.headerRight}>
                     <Text style={styles.raceNumber}>Nº 1136</Text>
@@ -46,7 +46,10 @@ export default function DetalhesDaCorrida() {
                 />
                 <View style={styles.delivererInfo}>
                     <Text>Entregador: <Text style={styles.delivererName}>Pedro</Text></Text>
-                    <Text>Telefone: <Text style={styles.delivererPhone}>(81) 99999-9999</Text></Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(`tel:${'(81) 99999-9999'}`)}>
+                        <Text>Telefone: <Text style={styles.delivererPhone}>(81) 99999-9999</Text></Text>
+                    </TouchableOpacity>
+
                     <Text>{renderStars(5)}</Text>{/* Substitua por um componente de avaliação real */}
                 </View>
             </View>
