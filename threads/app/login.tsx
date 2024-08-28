@@ -24,7 +24,9 @@ export default function LoginScreen() {
       } else {
         console.log("autenticado, indo para a tela inicial")
         router.push("/telaInicial")
+
         setLoading(true)
+
       }
 
     } catch (error) {

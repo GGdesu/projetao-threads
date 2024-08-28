@@ -2,6 +2,7 @@ import { supabase } from '@/utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import LoginScreen from './login';
 import { getActiveUser, getActiveUserData } from '@/utils/supabaseUtils';
@@ -25,6 +26,7 @@ export default function TelaInicial() {
         supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session)
         })
+
         getUser()
     }, [])
 
@@ -56,6 +58,7 @@ export default function TelaInicial() {
         try {
 
             const userData = await getActiveUserData()
+
             if (!userData) {
                 console.log("erro ao pegar dados do usuario")
                 return null
@@ -70,6 +73,7 @@ export default function TelaInicial() {
         } catch (error) {
             console.log(error)
             return null
+
         }
 
     }
@@ -104,12 +108,14 @@ export default function TelaInicial() {
 
                         <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
                         <View>
+
                             <Text style={styles.restauranteNome}>
                                 {userData && userData?.tipo_usuario === 1 && userData?.nome_loja
                                     ? userData.nome_loja
                                     : userData && userData?.tipo_usuario === 2 && userData?.nome
                                     ? userData.nome : "Nome indisponível"}
                             </Text>
+
                             <Text style={styles.restauranteLocalizacao}>Localização</Text>
                         </View>
                     </View>
