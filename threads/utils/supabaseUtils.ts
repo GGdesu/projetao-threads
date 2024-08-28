@@ -1,3 +1,4 @@
+import { UserData } from "./dataInterface";
 import { supabase } from "./supabase"
 
 export async function getActiveUser() {
@@ -77,16 +78,16 @@ export async function updateActiveUser(data: { [key: string]: any }, tipo_conta_
 }
 
 //vai pegar todas as infos de corridas relacionada ao usuario
-export async function getDelivers(nome_coluna: string ,id_usuario: string) {
+export async function getDelivers(nome_coluna: string, id_usuario: string) {
     try {
         const { data: entregas, error } = await supabase
             .from("entrega")
             .select("*")
             .eq(nome_coluna, id_usuario)
 
-        if(error){
+        if (error) {
             console.log("não foi possivel obter as entregas: ", error)
-        }else{
+        } else {
             console.log("entregas obtidas com sucesso")
             return entregas
         }
@@ -99,19 +100,47 @@ export async function getDelivers(nome_coluna: string ,id_usuario: string) {
 export async function getActiveDelivers() {
     try {
 
-        const {data: entregas, error} = await supabase
-        .from('entrega')
-        .select('*')
-        .eq("situacao_corrida", "ativa")
+        const { data: entregas, error } = await supabase
+            .from('entrega')
+            .select('*')
+            .eq("situacao_corrida", "ativa")
 
-        if(error){
+        if (error) {
             console.log("não foi possivel obter as entregas: ", error)
-        }else{
+        } else {
             console.log("entregas obtidas com sucesso")
             return entregas
         }
 
     } catch (error) {
         console.log("foi encontrado um erro ao executar codigo: ", error)
+    }
+}
+
+export async function updateActiveDelivers() {
+
+}
+
+export async function acceptActiveDelivers(id_entrega: string) {
+
+    try {
+        //lembrar de colocar manualmente para entregador
+        const userData: UserData = await getActiveUserData()
+
+        const {error} = await supabase
+        .from('entrega')
+        .update({nome_entregador: userData.nome, telefone_entregador: userData.telefone, entregador_id: userData.entregador_id})
+        .eq('id', id_entrega)
+
+        if(error){
+            console.log("Erro ao tentar atualizar informação da entrega: ", error)
+        }else{
+            console.log("Entrega aceita com sucesso")
+
+        }
+
+
+    } catch (error) {
+        console.log("erro capturado ao tentar aceitar o delivery: ", error)
     }
 }

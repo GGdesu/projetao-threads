@@ -64,6 +64,16 @@ export default function DetalhesDaCorrida() {
                 <Text><Text style={styles.boldText}>Coleta:</Text> 22:32</Text>
                 <Text><Text style={styles.boldText}>Endereço:</Text> Rua Lorem ipsum dolor sit amet, 03</Text>
             </View>
+
+            {/* Botões Aceitar e Recusar */}
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={[styles.button, styles.acceptButton]}>
+                    <Text style={styles.buttonText}>Aceitar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, styles.declineButton]}>
+                    <Text style={styles.buttonText}>Recusar</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -140,4 +150,28 @@ const styles = StyleSheet.create({
     boldText: {
         fontWeight: 'bold',
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    button: {
+        flex: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    acceptButton: {
+        backgroundColor: '#28a745',
+        marginRight: 10,
+    },
+    declineButton: {
+        backgroundColor: '#dc3545',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 });
