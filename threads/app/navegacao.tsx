@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Importando as telas
-import NovaEntregaScreen from './perfilLojista';
+import NovaEntregaScreen from './telaInicial';
 import EmAndamentoScreen from './andamentoLojista';
 import HistoricoScreen from './historicoLojista';
 
