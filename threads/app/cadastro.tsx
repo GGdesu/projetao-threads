@@ -54,21 +54,21 @@ export default function cadastroScreen() {
     }
   }
 
-  async function signUpWithEmail() {
-    setLoading(true)
+  // async function signUpWithEmail() {
+  //   setLoading(true)
 
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
+  //   const {
+  //     data: { session },
+  //     error,
+  //   } = await supabase.auth.signUp({
+  //     email: email,
+  //     password: password,
+  //   })
 
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
-    setLoading(false)
-  }
+  //   if (error) Alert.alert(error.message)
+  //   if (!session) Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
+  //   setLoading(false)
+  // }
 
   return (
     <View style={styles.container}>
@@ -76,20 +76,6 @@ export default function cadastroScreen() {
       <Text style={styles.cadastroTexto}> Cadastro </Text>
       <Text style={styles.informe}>Informe os seus dados {'\n'}para prosseguir com o cadastro</Text>
       <View style={styles.campoForm}>
-        <Input
-          placeholder='Informe seu nome completo'
-          inputStyle={styles.inputLabel}
-          label='Nome'
-          labelStyle={styles.labelForm}
-        />
-        <Input
-          placeholder='Seu número com DDD'
-          inputStyle={styles.inputLabel}
-          keyboardType="numeric"
-          onChangeText={handleInputChange}
-          label='Telefone'
-          labelStyle={styles.labelForm}
-        />
         <Input
           placeholder='Informe o email aqui'
           inputStyle={styles.inputLabel}
@@ -123,13 +109,19 @@ export default function cadastroScreen() {
         <Button title={'Cadastrar como Lojista'}
           disabled={loading}
           //onPress={() => signUpWithEmail()}
-          onPress={() => router.navigate("/cadastroLojista")}
+          onPress={() => router.push({
+            pathname: "/cadastroLojista",
+            params: {email, password}
+          })}
           titleStyle={styles.titleLojista}
           buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }}
           containerStyle={styles.containerForm} />
         <Button title={'Cadastrar como Entregador'}
           disabled={loading}
-          onPress={() => router.navigate("/cadastroEntregador")}
+          onPress={() => router.push({
+            pathname: "/cadastroEntregador",
+            params: {email, password}
+          })}
           //onPress={() => signUpWithEmail()} //criação de email
           titleStyle={styles.titleEntregador}
           buttonStyle={{ backgroundColor: '#fff', borderRadius: 5 }}

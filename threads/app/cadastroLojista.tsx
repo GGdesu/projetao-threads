@@ -1,16 +1,101 @@
-import { ScrollView, Text, View, StyleSheet, Image } from "react-native";
+import { ScrollView, Text, View, StyleSheet, Image, Alert } from "react-native";
 import { Button, Input } from "@rneui/base";
 import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { supabase } from "@/utils/supabase";
 
 export default function cadastroScreen() {
     const [value, setValue] = useState("");
     const router = useRouter();
+    const { email, password } = useLocalSearchParams();
+    //const [loading, setLoading] = useState(false)
 
-    const handleInputChange = (text: string) => {
-        const numericValue = text.replace(/[^0-9]/g, "");
-        setValue(numericValue);
+    //inputs do usuario
+    const [nomeLoja, setNomeLoja] = useState("")
+    const [cnpj, setCnpj] = useState("")
+    const [endereco, setEndereco] = useState("")
+    const [telefone, setTelefone] = useState("")
+    const [contaBancaria, setContaBancaria] = useState("");
+    const [rg, setRg] = useState("");
+    const [dataNascimento, setDataNascimento] = useState("");
+
+    // Certificar de que o email e a senha sejam strings
+    const emailString = Array.isArray(email) ? email[0] : email;
+    const passwordString = Array.isArray(password) ? password[0] : password;
+
+    const handleNomeLojaChange = (text: string) => {
+        setNomeLoja(text);
     };
+
+    const handleCnpjChange = (text: string) => {
+        const numericValue = text.replace(/[^0-9]/g, '');
+        setCnpj(numericValue);
+    };
+
+    const handleEnderecoChange = (text: string) => {
+        setEndereco(text);
+    };
+
+    const handleTelefoneChange = (text: string) => {
+        const numericValue = text.replace(/[^0-9]/g, '');
+        setTelefone(numericValue);
+    };
+
+    const handleContaBancariaChange = (text: string) => {
+        const numericValue = text.replace(/[^0-9]/g, '');
+        setContaBancaria(numericValue);
+    };
+
+    async function signUpWithEmail() {
+
+        try {
+            //setLoading(true)
+            const {
+                data: { user, session },
+                error,
+            } = await supabase.auth.signUp({
+                email: emailString,
+                password: passwordString,
+            })
+
+            if (error) {
+                Alert.alert(error.message)
+                return
+            }
+
+            // Se o cadastro foi bem-sucedido, salvar as informações adicionais
+            const { error: insertError } = await supabase
+                .from('usuario')
+                .insert([
+                    {
+                        lojista_id: user?.id,
+                        tipo_usuario: 1,
+                        nome_loja: nomeLoja,
+                        cnpj: parseInt(cnpj),
+                        endereco: endereco,
+                        telefone: parseInt(telefone),
+                        conta_bancaria: parseInt(contaBancaria),
+                    }
+                ])
+
+            if (insertError) {
+                Alert.alert('Erro ao salvar informações adicionais:', insertError.message)
+            }else{
+                Alert.alert("informaçoes salvas, por favor faça login")
+                router.navigate("/login")
+            }
+
+            if (!session) {
+                Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
+                //router.navigate("/login")
+            }
+            //setLoading(false)
+
+        } catch (err) {
+            console.error('Erro inesperado:', err);
+        }
+
+    }
 
     return (
         <ScrollView contentContainerStyle={styles.scrollView}>
@@ -22,39 +107,49 @@ export default function cadastroScreen() {
                 <Input
                     placeholder="Informe o nome da loja"
                     inputStyle={styles.inputLabel}
-                    label="Nome"
+                    label="Nome do estabelecimento"
                     labelStyle={styles.labelForm}
+                    onChangeText={handleNomeLojaChange}
+                    value={nomeLoja}
                 />
                 <Input
                     placeholder="Informe seu CNPJ"
                     inputStyle={styles.inputLabel}
                     keyboardType="numeric"
-                    onChangeText={handleInputChange}
                     label="CNPJ"
                     labelStyle={styles.labelForm}
+                    onChangeText={handleCnpjChange}
+                    value={cnpj}
                 />
                 <Input
                     placeholder="Informe seu Endereço"
                     inputStyle={styles.inputLabel}
                     label="Endereço"
                     labelStyle={styles.labelForm}
+                    onChangeText={handleEnderecoChange}
+                    value={endereco}
                 />
                 <Input
                     placeholder="Informe seu Telefone"
                     inputStyle={styles.inputLabel}
                     keyboardType="numeric"
-                    onChangeText={handleInputChange}
                     label="Telefone"
                     labelStyle={styles.labelForm}
+                    onChangeText={handleTelefoneChange}
+                    value={telefone}
                 />
                 <Input
                     placeholder="Informe sua Conta Bancaria"
                     inputStyle={styles.inputLabel}
                     label="Conta Bancária"
                     labelStyle={styles.labelForm}
+                    onChangeText={handleContaBancariaChange}
+                    value={contaBancaria}
                 />
                 <Button
+                    //disabled={loading}
                     title={"Finalizar Cadastro"}
+                    onPress={() => signUpWithEmail()}
                     titleStyle={styles.titleEntregador}
                     buttonStyle={{ backgroundColor: "#fff", borderRadius: 5 }}
                     containerStyle={styles.containerForm}
