@@ -17,12 +17,7 @@ export default function Index() {
                 <Text style={styles.textoEntrar}>Entrar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-                style={styles.entrarB}
-                onPress={() => router.navigate("/navegacao")}
-            >
-                <Text style={styles.textoEntrar}>Navegacao</Text>
-            </TouchableOpacity>
+            
             {/* <Link href='/cadastro' asChild>
       <TouchableOpacity style={styles.entrarB} >
         <Text style={styles.textoEntrar}>Entrar</Text>
