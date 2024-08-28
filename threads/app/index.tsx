@@ -17,6 +17,7 @@ export default function Index() {
                 <Text style={styles.textoEntrar}>Entrar</Text>
             </TouchableOpacity>
 
+            
             {/* <Link href='/cadastro' asChild>
       <TouchableOpacity style={styles.entrarB} >
         <Text style={styles.textoEntrar}>Entrar</Text>
