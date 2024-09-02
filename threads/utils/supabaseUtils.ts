@@ -1,4 +1,5 @@
 import { UserData } from "./dataInterface";
+
 import { supabase } from "./supabase"
 
 export async function getActiveUser() {
@@ -33,6 +34,7 @@ export async function getActiveUserData() {
             .eq("lojista_id", await getActiveUser())
 
         if (error) {
+
             console.log("erro ao obter as informações do usuario: ", error)
             return null
         }
