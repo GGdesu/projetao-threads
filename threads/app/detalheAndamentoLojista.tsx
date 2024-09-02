@@ -66,14 +66,14 @@ export default function DetalhesDaCorrida() {
             </View>
 
             {/* Botões Aceitar e Recusar */}
-            <View style={styles.buttonContainer}>
+            {/* <View style={styles.buttonContainer}>
                 <TouchableOpacity style={[styles.button, styles.acceptButton]}>
                     <Text style={styles.buttonText}>Aceitar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.button, styles.declineButton]}>
                     <Text style={styles.buttonText}>Recusar</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </View>
     );
 }

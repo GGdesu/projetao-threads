@@ -6,6 +6,7 @@ import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndi
 import LoginScreen from './login';
 import { getActiveUser, getActiveUserData } from '@/utils/supabaseUtils';
 import { Corrida, UserData } from '@/utils/dataInterface';
+import { FontAwesome } from '@expo/vector-icons';
 
 
 
@@ -91,6 +92,14 @@ export default function TelaInicial() {
                 <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
                 <Text style={styles.cardText}>Previsão de entrega: {item.previsaoEntrega}</Text>
             </View>
+            <View style={styles.buttonsContainer}>
+                <TouchableOpacity style={styles.acceptButton} onPress={() => {/* Função para aceitar */ }}>
+                    <FontAwesome name="check" size={20} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.rejectButton} onPress={() => {/* Função para recusar */ }}>
+                    <FontAwesome name="close" size={20} color="#fff" />
+                </TouchableOpacity>
+            </View>
         </TouchableOpacity>
     );
 
@@ -108,7 +117,7 @@ export default function TelaInicial() {
                                 {userData && userData?.tipo_usuario === 1 && userData?.nome_loja
                                     ? userData.nome_loja
                                     : userData && userData?.tipo_usuario === 2 && userData?.nome
-                                    ? userData.nome : "Nome indisponível"}
+                                        ? userData.nome : "Nome indisponível"}
                             </Text>
                             <Text style={styles.restauranteLocalizacao}>Localização</Text>
                         </View>
@@ -116,7 +125,7 @@ export default function TelaInicial() {
 
                     <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
                     {/* Filtros */}
-                    <View style={styles.filtros}>
+                    {/* <View style={styles.filtros}>
 
                         <TouchableOpacity
                             style={[styles.filtroButton, filtro === 'Todas' && styles.filtroButtonAtivo]}
@@ -128,7 +137,7 @@ export default function TelaInicial() {
                             onPress={() => setFiltro('Atrasadas')}>
                             <Text style={filtro === 'Atrasadas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Atrasadas</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
 
                     {/* Lista de Corridas */}
                     <FlatList
@@ -202,7 +211,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     cardAtrasada: {
-        backgroundColor: '#FF6F6F',
+        //backgroundColor: '#FF6F6F',
     },
     entregadorImage: {
         width: 60,
@@ -222,5 +231,22 @@ const styles = StyleSheet.create({
     },
     boldText: {
         fontWeight: 'bold',
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    acceptButton: {
+        backgroundColor: 'green',
+        borderRadius: 20,
+        padding: 10,
+        marginLeft: 10,
+    },
+    rejectButton: {
+        backgroundColor: 'red',
+        borderRadius: 20,
+        padding: 10,
+        marginLeft: 10,
     },
 });
