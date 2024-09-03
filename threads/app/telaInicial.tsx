@@ -106,7 +106,9 @@ export default function TelaInicial() {
 
                     <View style={styles.header}>
 
-                        <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
+                        <TouchableOpacity onPress={() => router.navigate(`/historicoEntregador`)}>
+                            <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
+                        </TouchableOpacity>
                         <View>
 
                             <Text style={styles.restauranteNome}>
