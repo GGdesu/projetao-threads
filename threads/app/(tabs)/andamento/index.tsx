@@ -72,7 +72,9 @@ export default function CorridasEmAndamento() {
             <View style={styles.container}>
                 {/* Cabeçalho do Restaurante */}
                 <View style={styles.header}>
-                    <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
+                    <TouchableOpacity onPress={() => router.navigate(`/historicoLojista`)}>
+                        <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
+                    </TouchableOpacity>
                     <View>
                         <Text style={styles.restauranteNome}>Restaurante ABC</Text>
                         <Text style={styles.restauranteLocalizacao}>Localização</Text>
