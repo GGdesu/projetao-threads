@@ -2,7 +2,7 @@ import { ScrollView, Text, View, FlatList, StyleSheet, Image, ListRenderItem, To
 import { Button } from "@rneui/base";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
-import { supabase } from '../utils/supabase';
+import { supabase } from '@/utils/supabase';
 
 interface Entrega {
   id: string;
