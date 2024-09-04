@@ -23,7 +23,7 @@ export default function LoginScreen() {
         setLoading(false)
       } else {
         console.log("autenticado, indo para a tela inicial")
-        router.push("/telaInicial")
+        router.push("/(tabs)/")
 
         setLoading(true)
 

@@ -3,7 +3,7 @@ import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import LoginScreen from './login';
+import LoginScreen from '@/app/login';
 
 interface Corrida {
     id: string;
@@ -54,7 +54,7 @@ export default function CorridasEmAndamento() {
     const renderCorrida = ({ item }: {item: Corrida}) => (
         <TouchableOpacity style={[styles.card, item.atrasada && styles.cardAtrasada]}
             onPress={() => router.push({
-                pathname: "/detalheAndamentoLojista",
+                pathname: "/(tabs)/andamento/detalheAndamentoLojista",
                 params: { corridaId: item.id }
             })}>
             <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />

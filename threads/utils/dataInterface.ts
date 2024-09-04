@@ -23,3 +23,8 @@ export interface UserData {
     tipo_usuario: number;
     veiculo: string | null;
 }
+
+export interface UserContextProps{
+    user: UserData | null;
+    setUser: (user: UserData | null) => void;
+}

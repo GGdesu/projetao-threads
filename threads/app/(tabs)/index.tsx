@@ -4,18 +4,22 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import LoginScreen from './login';
+import LoginScreen from '../login';
 import { getActiveUser, getActiveUserData } from '@/utils/supabaseUtils';
 import { Corrida, UserData } from '@/utils/dataInterface';
 import { FontAwesome } from '@expo/vector-icons';
+import { useUser } from '@/context/userContext';
 
 
 
 export default function TelaInicial() {
     const router = useRouter()
 
+    //utilizando o contexto
+    const { user, setUser } = useUser()
+
     const [filtro, setFiltro] = useState('Todas');
-    const [userData, setUserData] = useState<UserData | null>(null);
+    //const [userData, setUserData] = useState<UserData | null>(null);
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true)
 
@@ -66,9 +70,9 @@ export default function TelaInicial() {
             }
 
             if (userData) {
-                setUserData(userData)
+                setUser(userData)
             }
-            console.log(userData)
+            //console.log(userData)
             //setLoading(false)
 
         } catch (error) {
@@ -87,7 +91,7 @@ export default function TelaInicial() {
     const renderCorrida = ({ item }: { item: Corrida }) => (
         <TouchableOpacity style={[styles.card, item.atrasada && styles.cardAtrasada]}
             onPress={() => router.push({
-                pathname: "/detalheAndamentoLojista",
+                pathname: "/(tabs)/andamento/detalheAndamentoLojista",
                 params: { corridaId: item.id }
             })}>
             <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />
@@ -116,17 +120,19 @@ export default function TelaInicial() {
                     <View style={styles.header}>
 
                         <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
-                        <View>
+                        <TouchableOpacity onPress={() => router.push({pathname: "/perfilLojista"})}>
+                            <View>
 
-                            <Text style={styles.restauranteNome}>
-                                {userData && userData?.tipo_usuario === 1 && userData?.nome_loja
-                                    ? userData.nome_loja
-                                    : userData && userData?.tipo_usuario === 2 && userData?.nome
-                                        ? userData.nome : "Nome indisponível"}
-                            </Text>
+                                <Text style={styles.restauranteNome}>
+                                    {user && user?.tipo_usuario === 1 && user?.nome_loja
+                                        ? user.nome_loja
+                                        : user && user?.tipo_usuario === 2 && user?.nome
+                                            ? user.nome : "Nome indisponível"}
+                                </Text>
 
-                            <Text style={styles.restauranteLocalizacao}>Localização</Text>
-                        </View>
+                                <Text style={styles.restauranteLocalizacao}>Localização</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
 
                     <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
