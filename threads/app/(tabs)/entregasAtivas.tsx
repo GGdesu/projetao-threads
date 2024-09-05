@@ -2,27 +2,26 @@ import { supabase } from '@/utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import LoginScreen from '@/app/login';
+
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import LoginScreen from '../login';
+import { getActiveUser, getActiveUserData } from '@/utils/supabaseUtils';
+import { Corrida, UserData } from '@/utils/dataInterface';
+import { FontAwesome } from '@expo/vector-icons';
 import { useUser } from '@/context/userContext';
-import { getActiveUserData } from '@/utils/supabaseUtils';
 
-interface Corrida {
-    id: string;
-    entregador: string;
-    coleta: string;
-    previsaoEntrega: string;
-    atrasada: boolean;
-}
 
-export default function CorridasEmAndamento() {
+
+export default function TelaInicial() {
     const router = useRouter()
-    const [filtro, setFiltro] = useState('Todas');
 
-    //pegando a informação do usuario atravez do contexto
+    //utilizando o contexto
     const { user, setUser } = useUser()
 
+    const [filtro, setFiltro] = useState('Todas');
+    //const [userData, setUserData] = useState<UserData | null>(null);
     const [session, setSession] = useState<Session | null>(null);
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -34,8 +33,14 @@ export default function CorridasEmAndamento() {
         })
 
         getUser()
-
     }, [])
+
+    // if (loading) {
+    //     console.log("tela de loading")
+    //     return <ActivityIndicator size={"large"} color={"0000ff"} />
+    // }
+
+    const corridas: Corrida[] = [];
 
     //pegar infos do banco de dados
     async function getUser() {
@@ -62,23 +67,6 @@ export default function CorridasEmAndamento() {
 
     }
 
-    const corridas: Corrida[] = [
-        {
-            id: '1',
-            entregador: 'José',
-            coleta: '21:32',
-            previsaoEntrega: '21:52',
-            atrasada: true,
-        },
-        {
-            id: '2',
-            entregador: 'Pedro',
-            coleta: '22:32',
-            previsaoEntrega: '23:02',
-            atrasada: false,
-        },
-        // Adicione mais corridas aqui
-    ];
 
     const corridasFiltradas = corridas.filter(corrida =>
         filtro === 'Todas' || (filtro === 'Atrasadas' && corrida.atrasada)
@@ -92,9 +80,17 @@ export default function CorridasEmAndamento() {
             })}>
             <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />
             <View style={styles.cardInfo}>
-                <Text style={styles.entregadorNome}>Entregador: <Text style={styles.boldText}>{item.entregador}</Text></Text>
+                <Text style={styles.entregadorNome}>Entregador: <Text style={styles.boldText}>{item.nome_entregador}</Text></Text>
                 <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
                 <Text style={styles.cardText}>Previsão de entrega: {item.previsaoEntrega}</Text>
+            </View>
+            <View style={styles.buttonsContainer}>
+                <TouchableOpacity style={styles.acceptButton} onPress={() => {/* Função para aceitar */ }}>
+                    <FontAwesome name="check" size={20} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.rejectButton} onPress={() => {/* Função para recusar */ }}>
+                    <FontAwesome name="close" size={20} color="#fff" />
+                </TouchableOpacity>
             </View>
         </TouchableOpacity>
     );
@@ -104,10 +100,10 @@ export default function CorridasEmAndamento() {
             {session && session.user ? (
                 <View style={styles.container}>
                     {/* Cabeçalho do Restaurante */}
+
                     <View style={styles.header}>
 
                         <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
-
                         <TouchableOpacity onPress={() => router.push({ pathname: "/pf_entregador_lojista" })}>
                             <View>
 
@@ -127,7 +123,7 @@ export default function CorridasEmAndamento() {
 
                     <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
                     {/* Filtros */}
-                    <View style={styles.filtros}>
+                    {/* <View style={styles.filtros}>
 
                         <TouchableOpacity
                             style={[styles.filtroButton, filtro === 'Todas' && styles.filtroButtonAtivo]}
@@ -139,7 +135,7 @@ export default function CorridasEmAndamento() {
                             onPress={() => setFiltro('Atrasadas')}>
                             <Text style={filtro === 'Atrasadas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Atrasadas</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
 
                     {/* Lista de Corridas */}
                     <FlatList
@@ -147,6 +143,9 @@ export default function CorridasEmAndamento() {
                         renderItem={renderCorrida}
                         keyExtractor={item => item.id}
                         contentContainerStyle={styles.listaCorridas}
+                        ListEmptyComponent={
+                            <Text style={styles.emptyMessage}>Nenhuma entrega realizada ainda.</Text>
+                        }
                     />
                 </View>
             ) : (<LoginScreen />)}
@@ -213,7 +212,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     cardAtrasada: {
-        backgroundColor: '#FF6F6F',
+        //backgroundColor: '#FF6F6F',
     },
     entregadorImage: {
         width: 60,
@@ -228,10 +227,33 @@ const styles = StyleSheet.create({
     entregadorNome: {
         color: '#fff',
     },
+    emptyMessage: {
+        textAlign: 'center',
+        marginTop: 20,
+        fontSize: 16,
+        color: '#999',
+    },
     cardText: {
         color: '#fff',
     },
     boldText: {
         fontWeight: 'bold',
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    acceptButton: {
+        backgroundColor: 'green',
+        borderRadius: 20,
+        padding: 10,
+        marginLeft: 10,
+    },
+    rejectButton: {
+        backgroundColor: 'red',
+        borderRadius: 20,
+        padding: 10,
+        marginLeft: 10,
     },
 });

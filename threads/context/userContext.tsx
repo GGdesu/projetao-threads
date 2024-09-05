@@ -1,4 +1,4 @@
-import { UserContextProps, UserData } from "@/utils/dataInterface";
+import { Corrida, UserContextProps, UserData } from "@/utils/dataInterface";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 
@@ -18,9 +18,10 @@ export const useUser = () => {
 // provedor de contexto
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<UserData | null>(null);
+    const [corridas, setCorridas] = useState<Corrida[] | null>(null);
 
     return (
-        <UserContext.Provider value={{user, setUser}}>
+        <UserContext.Provider value={{user, setUser, corridas, setCorridas}}>
             {children}
         </UserContext.Provider>
     )

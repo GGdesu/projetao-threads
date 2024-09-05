@@ -3,8 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Importando as telas
-import NovaEntregaScreen from './(tabs)';
-import EmAndamentoScreen from './(tabs)/andamento';
+import NovaEntregaScreen from './(tabs)/entregasAtivas';
+import EmAndamentoScreen from './(tabs)';
 import HistoricoScreen from './(tabs)/historicoLojista';
 
 const Tab = createBottomTabNavigator();

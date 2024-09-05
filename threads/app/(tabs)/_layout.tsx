@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 export default function TabLayout() {
 
-    const { user, setUser } = useUser()
+    const { user } = useUser()
 
     return (
         <Tabs screenOptions={{
@@ -35,12 +35,13 @@ export default function TabLayout() {
             headerShown: false,
         }}>
             <Tabs.Screen
-                name="index"
+                name="andamento"
                 options={{
                     title: "Home",
                     href: null
                 }}
             />
+            
             {/* condicional que mostra a tab bar para o lojista, caso o usuario seja o lojista */}
             {user?.tipo_usuario === 1 ? (
                 <Tabs.Screen
@@ -60,11 +61,12 @@ export default function TabLayout() {
                     }}
                 />
             )}
+            
 
             {/* condicional que mostra a tab bar para o entregador, caso o usuario seja o entregador */}
             {user?.tipo_usuario === 2 ? (
                 <Tabs.Screen
-                    name="novaEntregaEntregador"
+                    name="entregasAtivas"
                     options={{
                         title: "Corridas ativas",
                         tabBarIcon: ({ color }) => < Icon name="package-variant-closed" size={28} color={color} />
@@ -72,7 +74,7 @@ export default function TabLayout() {
                 />
             ) : (
                 <Tabs.Screen
-                    name="novaEntregaEntregador"
+                    name="entregasAtivas"
                     options={{
                         title: "Corridas ativas",
                         tabBarIcon: ({ color }) => < Icon name="package-variant-closed" size={28} color={color} />,
@@ -82,7 +84,7 @@ export default function TabLayout() {
             )}
 
             <Tabs.Screen
-                name="andamento"
+                name="index"
                 options={{
                     title: "Andamento",
                     tabBarIcon: ({ color }) => < Icon name="bike" size={28} color={color} />

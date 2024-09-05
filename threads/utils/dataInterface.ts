@@ -1,6 +1,17 @@
 export interface Corrida {
     id: string;
-    entregador: string;
+    entregador_id: string | null;
+    lojista_id: string | null;
+    nome_lojista: string | null;
+    nome_entregador: string | null;
+    telefone_lojista: number | null;
+    telefone_entregador: number | null;
+    tempo_preparo: number | null;
+    tempo_max_entrega: number | null;
+    endereco_entrega: string | null;
+    situacao_corrida: string | null;
+    preco: number | null;
+    avaliacao: number | null;
     coleta: string;
     previsaoEntrega: string;
     atrasada: boolean;
@@ -27,4 +38,6 @@ export interface UserData {
 export interface UserContextProps{
     user: UserData | null;
     setUser: (user: UserData | null) => void;
+    corridas: Corrida[] | null;
+    setCorridas: (corridas: Corrida[] | null) => void;
 }

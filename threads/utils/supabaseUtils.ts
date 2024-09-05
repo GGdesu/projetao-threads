@@ -35,10 +35,35 @@ export async function getActiveUserData() {
 
         if (error) {
 
-            console.log("erro ao obter as informações do usuario: ", error)
+            console.log("erro ao obter as informações do Lojista: ", error)
             return null
         }
+        if (user && user[0] == undefined) {
+            try {
+                const { data: user, error } = await supabase
+                    .from('usuario')
+                    .select('*')
+                    .eq('entregador_id', await getActiveUser())
 
+
+                if (error) {
+
+                    console.log("erro ao obter as informações do entregador: ", error)
+                    return null
+                }
+
+                if (user) {
+                    console.log("informações do usuário resgatadas com sucesso: ", user[0])
+                    return user[0]
+                } else {
+                    console.log("nenhum usuario logado")
+                    return null
+                }
+
+            } catch (error) {
+                console.log("Erro ao tentar resgatar o entregador:", error)
+            }
+        }
         if (user) {
             console.log("informações do usuário resgatadas com sucesso: ", user[0])
             return user[0]
@@ -48,7 +73,7 @@ export async function getActiveUserData() {
         }
 
     } catch (error) {
-        console.log("Erro ao tentar resgatar o usuario:", error)
+        console.log("Erro ao tentar resgatar o entregador:", error)
     }
 }
 
@@ -129,14 +154,14 @@ export async function acceptActiveDelivers(id_entrega: string) {
         //lembrar de colocar manualmente para entregador
         const userData: UserData = await getActiveUserData()
 
-        const {error} = await supabase
-        .from('entrega')
-        .update({nome_entregador: userData.nome, telefone_entregador: userData.telefone, entregador_id: userData.entregador_id})
-        .eq('id', id_entrega)
+        const { error } = await supabase
+            .from('entrega')
+            .update({ nome_entregador: userData.nome, telefone_entregador: userData.telefone, entregador_id: userData.entregador_id })
+            .eq('id', id_entrega)
 
-        if(error){
+        if (error) {
             console.log("Erro ao tentar atualizar informação da entrega: ", error)
-        }else{
+        } else {
             console.log("Entrega aceita com sucesso")
 
         }

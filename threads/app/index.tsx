@@ -6,7 +6,7 @@ export default function Index() {
 
     return (
         <View style={styles.container}>
-            <Image source={require("../assets/images/react-logo.png")} />
+            <Image source={require("@/assets/images/react-logo.png")} />
             <Text style={styles.texto}>Threads</Text>
             <Text style={styles.textoNegrito}>Otimizando Suas Entregas</Text>
 

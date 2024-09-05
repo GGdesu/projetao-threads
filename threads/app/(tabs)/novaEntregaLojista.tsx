@@ -2,54 +2,124 @@ import { ScrollView, Text, View, StyleSheet, Image } from "react-native";
 import { Button, Input } from "@rneui/base";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { useUser } from "@/context/userContext";
+import { supabase } from "@/utils/supabase";
+import { Alert } from "react-native";
 
 export default function logistaScreen() {
     const [value, setValue] = useState("");
     const router = useRouter();
 
-    const handleInputChange = (text: string) => {
-        const numericValue = text.replace(/[^0-9]/g, "");
-        setValue(numericValue);
+    //infos do usuario pegas atraves do context
+    const { user } = useUser();
+
+    //inputs do usuario
+    const [tempoPreparo, setTempoPreparo] = useState("")
+    const [tempoMax, setTempoMax] = useState("")
+    const [endereco, setEndereco] = useState("")
+
+    const preco = 10
+
+    const handleEnderecoChange = (text: string) => {
+        setEndereco(text);
     };
+
+    const handleTempoPreparoChange = (text: string) => {
+        const numericValue = text.replace(/[^0-9]/g, '');
+        setTempoPreparo(numericValue);
+    };
+
+    const handleTempoMaxChange = (text: string) => {
+        const numericValue = text.replace(/[^0-9]/g, '');
+        setTempoMax(numericValue);
+    };
+    
+    async function criarEntrega() {
+        
+        try {
+            
+            const { error: upsertError } = await supabase
+            .from("entrega")
+            .upsert({
+                lojista_id: user?.lojista_id,
+                nome_lojista: user?.nome_loja,
+                telefone_lojista: user?.telefone,
+                tempo_preparo: tempoPreparo,
+                tempo_max_entrega: tempoMax,
+                endereco_entrega: endereco,
+                situacao_corrida: "ativa",
+                preco: preco,
+
+
+            })
+
+            if (upsertError) {
+                Alert.alert('Erro ao salvar informações adicionais:', upsertError.message)
+            }else{
+                //console.log("entrega criada com sucesso")
+                Alert.alert("entrega criada com sucesso")
+                router.navigate("/(tabs)/")
+            }
+
+        } catch (error) {
+            
+        }
+
+    }
+
 
     return (
         <View style={styles.screenContainer}>
             <View style={styles.container}>
-                <Image
+                {/* <Image
                     style={styles.img}
-                    //source={require("../assets/images/iconePerfil.png")}
-                />
+                    source={require("@/assets/images/iconePerfil.png")}
+                /> */}
                 <Text style={styles.perfilTexto}>
-                    Nome do restaurante {"\n"}Localização
+                    {user && user?.tipo_usuario === 1 && user?.nome_loja
+                        ? user.nome_loja
+                        : "Nome indisponivel"}
                 </Text>
+
+                <Text style={{ color: '#808080' }}>{user && user?.tipo_usuario === 1 && user?.endereco
+                    ? user.endereco
+                    : "Endereço indisponivel"}
+                    </Text>
             </View>
             <View style={styles.formContainer}>
                 <Text style={styles.tituloTexto}>Informações da corrida</Text>
                 <Input
-                    placeholder="Tempo de preparo do produto"
+                    placeholder="Tempo de preparo do produto em minuto"
                     containerStyle={styles.inputContainer}
                     label="Tempo de preparo"
-                    //labelStyle={styles.inputTexto}
+                    onChangeText={handleTempoPreparoChange}
+                    value={tempoPreparo}
+                //labelStyle={styles.inputTexto}
                 />
                 <Input
-                    placeholder="Tempo máximo para entrega"
+                    placeholder="Tempo máximo para entrega em minuto"
                     containerStyle={styles.inputContainer}
                     //inputStyle={}
                     label="Tempo máximo para entrega"
-                    //labelStyle={styles.inputTexto}
+                    onChangeText={handleTempoMaxChange}
+                    value={tempoMax}
+                //labelStyle={styles.inputTexto}
                 />
                 <Input
                     placeholder="Informe o endereço de entrega"
                     inputStyle={(styles.inputTexto, { height: 90 })}
                     containerStyle={styles.inputContainer}
                     label="Endereço de entrega"
-                    //labelStyle={styles.inputTexto}
+                    onChangeText={handleEnderecoChange}
+                    value={endereco}
+                //labelStyle={styles.inputTexto}
                 />
                 <View style={styles.buttonContainer}>
                     <View style={styles.buttonWrapper}>
                         <Button
                             title={"Solicitar corrida"}
                             buttonStyle={styles.smallButton}
+                            onPress={criarEntrega}
                         />
                     </View>
                 </View>
@@ -87,8 +157,9 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     perfilTexto: {
-        textAlign: "left",
         fontSize: 18,
+        fontWeight: 'bold',
+        //textAlign: "left",
     },
     tituloTexto: {
         fontSize: 18,
