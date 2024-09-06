@@ -88,9 +88,6 @@ export default function TelaInicial() {
                 <TouchableOpacity style={styles.acceptButton} onPress={() => {/* Função para aceitar */ }}>
                     <FontAwesome name="check" size={20} color="#fff" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.rejectButton} onPress={() => {/* Função para recusar */ }}>
-                    <FontAwesome name="close" size={20} color="#fff" />
-                </TouchableOpacity>
             </View>
         </TouchableOpacity>
     );
