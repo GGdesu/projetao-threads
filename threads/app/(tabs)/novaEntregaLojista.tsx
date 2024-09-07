@@ -46,7 +46,7 @@ export default function logistaScreen() {
                 nome_lojista: user?.nome_loja,
                 telefone_lojista: user?.telefone,
                 tempo_preparo: tempoPreparo,
-                tempo_max_entrega: tempoMax,
+                previsao_entrega: "20:25",
                 endereco_entrega: endereco,
                 situacao_corrida: "ativa",
                 preco: preco,
@@ -59,7 +59,7 @@ export default function logistaScreen() {
             }else{
                 //console.log("entrega criada com sucesso")
                 Alert.alert("entrega criada com sucesso")
-                router.navigate("/(tabs)/")
+                //router.push({pathname:""})
             }
 
         } catch (error) {
@@ -81,16 +81,7 @@ export default function logistaScreen() {
                     onChangeText={handleTempoPreparoChange}
                     value={tempoPreparo}
                 //labelStyle={styles.inputTexto}
-                />
-                <Input
-                    placeholder="Tempo máximo para entrega em minuto"
-                    containerStyle={styles.inputContainer}
-                    //inputStyle={}
-                    label="Tempo máximo para entrega"
-                    onChangeText={handleTempoMaxChange}
-                    value={tempoMax}
-                //labelStyle={styles.inputTexto}
-                />
+                />                
                 <Input
                     placeholder="Informe o endereço de entrega"
                     inputStyle={(styles.inputTexto, { height: 90 })}

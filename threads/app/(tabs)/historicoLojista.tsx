@@ -31,36 +31,37 @@ export default function historicoScreen() {
   const { user } = useUser();
 
 
-  useEffect(() => {
-    const fetchEntregas = async () => {
-      try {
-        // Obtendo o usuário logado
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-
-        if (sessionError) {
-          throw sessionError;
+    useEffect(() => {      
+      const fetchEntregas = async () => {
+        try {
+          // Obtendo o usuário logado
+          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  
+          if (sessionError) {
+            throw sessionError;
+          }
+  
+          const userId = sessionData.session?.user.id; // Obtendo o ID do usuário logado
+  
+          if (!userId) {
+            console.error('Usuário não está logado');
+            return;
+          }
+  
+          // Buscando entregas do usuário logado
+          const { data, error } = await supabase
+            .from('entrega') // Nome da tabela
+            .select('*')
+            .eq('lojista_id', userId)
+            .eq('situacao_corrida', 'finalizada');
+  
+          if (error) {
+            throw error;
+          }
+          setEntregas(data as Entrega[]);
+        } catch (error) {
+          console.error('Erro ao buscar entregas:', error);
         }
-
-        const userId = sessionData.session?.user.id; // Obtendo o ID do usuário logado
-
-        if (!userId) {
-          console.error('Usuário não está logado');
-          return;
-        }
-
-        // Buscando entregas do usuário logado
-        const { data, error } = await supabase
-          .from('entrega') // Nome da tabela
-          .select('*')
-          .eq('lojista_id', userId); // Filtra as entregas pelo ID do usuário
-
-        if (error) {
-          throw error;
-        }
-        setEntregas(data as Entrega[]);
-      } catch (error) {
-        console.error('Erro ao buscar entregas:', error);
-      }
 
 
     };
