@@ -1,8 +1,27 @@
+import { useUser } from '@/context/userContext';
 import { FontAwesome } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 
 export default function DetalhesDaCorrida() {
+
+    const { corridas } = useUser(); // A lista de corridas vinda do contexto
+    const {  corridaID, atrasada } = useLocalSearchParams(); // Pegando o ID da corrida da URL
+    const { user } = useUser();
+
+    // Encontrando a corrida específica com base no id
+    const corrida = corridas?.find(corrida => corrida.id === corridaID);
+
+    // Caso não tenha encontrado a corrida
+    if (!corrida) {
+        return (
+            <View>
+                <Text>Corrida não encontrada {corridaID}</Text>
+            </View>
+        );
+    }
+
 
     const renderStars = (rating: number) => {
         const stars = [];
@@ -28,11 +47,11 @@ export default function DetalhesDaCorrida() {
 
             {/* Seção de Previsão */}
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={styles.subTitle}>Previsão: 23:02</Text>
+                <Text style={styles.subTitle}>Previsão: {corrida.previsao_entrega}</Text>
                 <View style={styles.headerRight}>
                     <Text style={styles.raceNumber}>Nº 1136</Text>
                     <TouchableOpacity style={styles.statusButton}>
-                        <Text style={styles.statusText}>Atrasada</Text>
+                        <Text style={styles.statusText}>{atrasada}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -45,12 +64,12 @@ export default function DetalhesDaCorrida() {
                     source={{ uri: 'https://via.placeholder.com/150' }} // Substitua pela URL da imagem real
                 />
                 <View style={styles.delivererInfo}>
-                    <Text>Entregador: <Text style={styles.delivererName}>Pedro</Text></Text>
-                    <TouchableOpacity onPress={() => Linking.openURL(`tel:${'(81) 99999-9999'}`)}>
-                        <Text>Telefone: <Text style={styles.delivererPhone}>(81) 99999-9999</Text></Text>
+                    <Text>{user?.tipo_usuario === 1 ? "Entregador: " : "Restaurante"}<Text style={styles.delivererName}></Text>{user?.tipo_usuario === 1 ? corrida.nome_entregador : user?.nome_loja}</Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(`tel:${user?.telefone}`)}>
+                        <Text>Telefone: <Text style={styles.delivererPhone}>{user?.telefone}</Text></Text>
                     </TouchableOpacity>
 
-                    <Text>{renderStars(5)}</Text>{/* Substitua por um componente de avaliação real */}
+                    <Text>{user?.tipo_usuario === 2 ? renderStars(5) : ""}</Text>{/* Substitua por um componente de avaliação real */}
                 </View>
             </View>
 
@@ -59,10 +78,10 @@ export default function DetalhesDaCorrida() {
 
             {/* Seção de Informações da Corrida */}
             <View style={styles.infoContainer}>
-                <Text><Text style={styles.boldText}>Preço da corrida:</Text> R$5,00</Text>
-                <Text><Text style={styles.boldText}>Solicitada:</Text> 22:02</Text>
-                <Text><Text style={styles.boldText}>Coleta:</Text> 22:32</Text>
-                <Text><Text style={styles.boldText}>Endereço:</Text> Rua Lorem ipsum dolor sit amet, 03</Text>
+                <Text><Text style={styles.boldText}>Preço da corrida: R$</Text>{corrida.preco}</Text>
+                <Text><Text style={styles.boldText}>Solicitada:</Text> {formatarDataHoraISO(corrida.created_at)}</Text>
+                <Text><Text style={styles.boldText}>Coleta:</Text> {corrida.coleta}</Text>
+                <Text><Text style={styles.boldText}>Endereço de Entrega:</Text> {corrida.endereco_entrega}</Text>
             </View>
 
             {/* Botões Aceitar e Recusar */}
@@ -77,6 +96,41 @@ export default function DetalhesDaCorrida() {
         </View>
     );
 }
+
+const formatarDataHoraISO = (created_at: string): string => {
+    const data = new Date(created_at);
+
+    // Verifica se a data é válida
+    if (isNaN(data.getTime())) {
+        console.log(created_at)
+        return "Data inválida";
+    }
+
+    // Formatar a data e a hora no formato desejado
+    const dia = String(data.getUTCDate()).padStart(2, '0');
+    const mes = String(data.getUTCMonth() + 1).padStart(2, '0'); // Janeiro é 0
+    const ano = data.getUTCFullYear();
+
+    const horas = String(data.getUTCHours()).padStart(2, '0');
+    const minutos = String(data.getUTCMinutes()).padStart(2, '0');
+    console.log(`${dia}/${mes}/${ano} às ${horas}:${minutos}`)
+
+    return `${dia}/${mes}/${ano} às ${horas}:${minutos}`;
+    
+    // const data = new Date(created_at);
+
+    // // Formatar a data e a hora no formato desejado
+    // const dia = String(data.getDate()).padStart(2, '0');
+    // const mes = String(data.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+    // const ano = data.getFullYear();
+
+    // const horas = String(data.getHours()).padStart(2, '0');
+    // const minutos = String(data.getMinutes()).padStart(2, '0');
+    // console.log(`${dia}/${mes}/${ano} às ${horas}:${minutos}`)
+
+    // return `${dia}/${mes}/${ano} às ${horas}:${minutos}`;
+}
+
 
 const styles = StyleSheet.create({
     container: {

@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useUser } from "@/context/userContext";
 import { supabase } from "@/utils/supabase";
 import { Alert } from "react-native";
+import HeaderThreads from "@/components/Header";
 
 export default function logistaScreen() {
     const [value, setValue] = useState("");
@@ -18,7 +19,7 @@ export default function logistaScreen() {
     const [tempoMax, setTempoMax] = useState("")
     const [endereco, setEndereco] = useState("")
 
-    const preco = 10
+    const preco = 5
 
     const handleEnderecoChange = (text: string) => {
         setEndereco(text);
@@ -70,22 +71,7 @@ export default function logistaScreen() {
 
     return (
         <View style={styles.screenContainer}>
-            <View style={styles.container}>
-                {/* <Image
-                    style={styles.img}
-                    source={require("@/assets/images/iconePerfil.png")}
-                /> */}
-                <Text style={styles.perfilTexto}>
-                    {user && user?.tipo_usuario === 1 && user?.nome_loja
-                        ? user.nome_loja
-                        : "Nome indisponivel"}
-                </Text>
-
-                <Text style={{ color: '#808080' }}>{user && user?.tipo_usuario === 1 && user?.endereco
-                    ? user.endereco
-                    : "Endereço indisponivel"}
-                    </Text>
-            </View>
+            <HeaderThreads user={user} />
             <View style={styles.formContainer}>
                 <Text style={styles.tituloTexto}>Informações da corrida</Text>
                 <Input

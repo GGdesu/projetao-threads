@@ -105,7 +105,7 @@ export async function updateActiveUser(data: { [key: string]: any }, tipo_conta_
 }
 
 //vai pegar todas as infos de corridas relacionada ao usuario
-export async function getDelivers(nome_coluna: string, id_usuario: string) {
+export async function getDelivers(nome_coluna: string, id_usuario: string | null) {
     try {
         const { data: entregas, error } = await supabase
             .from("entrega")
@@ -115,7 +115,7 @@ export async function getDelivers(nome_coluna: string, id_usuario: string) {
         if (error) {
             console.log("não foi possivel obter as entregas: ", error)
         } else {
-            console.log("entregas obtidas com sucesso")
+            console.log("entregas obtidas com sucesso: ", entregas)
             return entregas
         }
 

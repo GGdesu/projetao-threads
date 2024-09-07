@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, Button } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { useUser } from '@/context/userContext';
 
 interface DeliveryHistoryItem {
   id: string;
@@ -24,6 +25,9 @@ interface Deliverer {
 const profilePicture = require('../assets/images/profile.jpg');
 
 const DelivererProfileScreen: React.FC = () => {
+  
+  const { user } = useUser();
+  
   const deliverer: Deliverer = {
     id: '1',
     name: 'João da Silva',
@@ -90,8 +94,8 @@ const DelivererProfileScreen: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.profileHeader}>
         <Image source={deliverer.profilePicture} style={styles.profilePicture} />
-        <Text style={styles.name}>{deliverer.name}</Text>
-        <Text style={styles.phone}>Telefone: {deliverer.phone}</Text>
+        <Text style={styles.name}>{user?.nome}</Text>
+        <Text style={styles.phone}>Telefone: {user?.telefone}</Text>
         <Text style={styles.ratingText}>{renderStars(deliverer.rating)}</Text>
       </View>
       <View style={styles.filtersContainer}>

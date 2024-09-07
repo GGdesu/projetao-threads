@@ -3,6 +3,8 @@ import { Button } from "@rneui/base";
 import { useState, useEffect } from 'react';
 import { useRouter } from "expo-router";
 import { supabase } from '@/utils/supabase';
+import HeaderThreads from "@/components/Header";
+import { useUser } from "@/context/userContext";
 
 interface Entrega {
   id: string;
@@ -21,6 +23,8 @@ export default function historicoScreen() {
     const [faturamento, setFaturamento] = useState<number | null>(null);
     const [numeroEntregas, setNumeroEntregas] = useState<number | null>(null);
     const [entregadorNome, setEntregadorNome] = useState<string | null>(null);
+
+    const { user } = useUser();
     
 
     useEffect(() => {      
@@ -125,15 +129,7 @@ export default function historicoScreen() {
     
     return (
         <View style={styles.container}>
-        <View style={styles.square}>
-          <View style={styles.header}>
-            <Image source={{ uri: 'https://via.placeholder.com/50' }} style={styles.avatar} />
-            <View>
-              <Text style={styles.storeName}>Entregador</Text>
-              <Text style={styles.ownerName}>{entregadorNome || 'Nome do Entregador'}</Text>
-            </View>
-          </View>
-        </View>
+        <HeaderThreads user={ user }/>
         <View style={styles.historico}>
           <Text style={styles.title}>Histórico</Text>
           <View style={styles.infoContainer}>

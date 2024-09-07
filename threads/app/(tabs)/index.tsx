@@ -5,15 +5,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import LoginScreen from '@/app/login';
 import { useUser } from '@/context/userContext';
-import { getActiveUserData } from '@/utils/supabaseUtils';
+import { getActiveUserData, getDelivers } from '@/utils/supabaseUtils';
+import HeaderThreads from '@/components/Header';
+import { Corrida } from '@/utils/dataInterface';
+import moment from 'moment';
 
-interface Corrida {
-    id: string;
-    entregador: string;
-    coleta: string;
-    previsaoEntrega: string;
-    atrasada: boolean;
-}
 
 export default function CorridasEmAndamento() {
     const router = useRouter()
@@ -21,6 +17,7 @@ export default function CorridasEmAndamento() {
 
     //pegando a informação do usuario atravez do contexto
     const { user, setUser } = useUser()
+    const { corridas, setCorridas } = useUser()
 
     const [session, setSession] = useState<Session | null>(null);
 
@@ -34,7 +31,8 @@ export default function CorridasEmAndamento() {
         })
 
         getUser()
-
+        
+        
     }, [])
 
     //pegar infos do banco de dados
@@ -50,6 +48,10 @@ export default function CorridasEmAndamento() {
 
             if (userData) {
                 setUser(userData)
+                //assim que ele consegue pegar o usuario ele pega a as corridas
+                getCorridas()
+                
+
             }
             //console.log(userData)
             //setLoading(false)
@@ -62,39 +64,100 @@ export default function CorridasEmAndamento() {
 
     }
 
-    const corridas: Corrida[] = [
-        {
-            id: '1',
-            entregador: 'José',
-            coleta: '21:32',
-            previsaoEntrega: '21:52',
-            atrasada: true,
-        },
-        {
-            id: '2',
-            entregador: 'Pedro',
-            coleta: '22:32',
-            previsaoEntrega: '23:02',
-            atrasada: false,
-        },
-        // Adicione mais corridas aqui
-    ];
+    async function getCorridas() {
+        try {
 
-    const corridasFiltradas = corridas.filter(corrida =>
-        filtro === 'Todas' || (filtro === 'Atrasadas' && corrida.atrasada)
-    );
+            if (user?.tipo_usuario === 1) {
+                const userCorrida = await getDelivers("lojista_id", user?.lojista_id)
 
-    const renderCorrida = ({ item }: { item: Corrida }) => (
-        <TouchableOpacity style={[styles.card, item.atrasada && styles.cardAtrasada]}
+                if (!userCorrida) {
+                    console.log("erro ao tentar receber dados na variavel userCorrida: ", userCorrida)
+                    return null
+                }
+
+                if (userCorrida) {
+                    setCorridas(userCorrida)
+                }
+
+            } else if (user?.tipo_usuario === 2) {
+                const userCorrida = await getDelivers("entregador_id", user?.entregador_id)
+
+                if (!userCorrida) {
+                    console.log("erro ao tentar receber dados na variavel userCorrida: ", userCorrida)
+                    return null
+                }
+
+                if (userCorrida) {
+                    setCorridas(userCorrida)
+                }
+            }
+
+            console.log("tentou pegar as corridas")
+
+
+
+
+        } catch (error) {
+            console.log("erro na função getCorridas: ", error)
+            return null
+        }
+    }
+
+    // const corridas_mock: Corrida[] = [
+    //     {
+    //         id: '1',
+    //         entregador: 'José',
+    //         coleta: '21:32',
+    //         previsaoEntrega: '21:52',
+    //         atrasada: true,
+    //     },
+    //     {
+    //         id: '2',
+    //         entregador: 'Pedro',
+    //         coleta: '22:32',
+    //         previsaoEntrega: '23:02',
+    //         atrasada: false,
+    //     },
+    //     // Adicione mais corridas aqui
+    // ];
+
+    // const corridasFiltradas = corridas?.filter(corrida =>
+    //     filtro === 'Todas' || (filtro === 'Atrasadas' && isAtrasada(corrida?.create_at, corrida?.previsao_entrega))
+    // );
+
+    const corridasFiltradas = corridas?.filter(corrida => {
+        const isAtrasadaEntrega = isAtrasada(corrida?.created_at, corrida?.previsao_entrega);
+        const situacaoValida = corrida?.situacao_corrida === "andamento" || corrida?.situacao_corrida === "ativa";
+    
+        return (filtro === 'Todas' || (filtro === 'Atrasadas' && isAtrasadaEntrega)) && situacaoValida;
+    })
+
+    const renderCorridaLojista = ({ item }: { item: Corrida }) => (
+        <TouchableOpacity style={[styles.card, isAtrasada(item?.created_at, item.previsao_entrega) && styles.cardAtrasada]}
             onPress={() => router.push({
                 pathname: "/detalheAndamentoLojista",
-                params: { corridaId: item.id }
+                params: { corridaID: item?.id , atrasada: isAtrasada(item?.created_at, item.previsao_entrega) ? "Atrasada" : "Em Tempo"}
             })}>
-            <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />
+            {/* <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} /> */}
             <View style={styles.cardInfo}>
-                <Text style={styles.entregadorNome}>Entregador: <Text style={styles.boldText}>{item.entregador}</Text></Text>
+                <Text style={styles.entregadorNome}>Entregador: <Text style={styles.boldText}>{item?.nome_entregador}</Text></Text>
                 <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
-                <Text style={styles.cardText}>Previsão de entrega: {item.previsaoEntrega}</Text>
+                <Text style={styles.cardText}>Previsão de entrega: {item?.previsao_entrega}</Text>
+            </View>
+        </TouchableOpacity>
+    );
+
+    const renderCorridaEntregador = ({ item }: { item: Corrida }) => (
+        <TouchableOpacity style={[styles.card, isAtrasada(item.created_at, item.previsao_entrega) && styles.cardAtrasada]}
+            onPress={() => router.push({
+                pathname: "/detalheAndamentoLojista",
+                params: { corridaID: item.id }
+            })}>
+            {/* <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} /> */}
+            <View style={styles.cardInfo}>
+                <Text style={styles.entregadorNome}>Lojista: <Text style={styles.boldText}>{item.nome_lojista}</Text></Text>
+                <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
+                <Text style={styles.cardText}>Previsão de entrega: {item.previsao_entrega}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -104,26 +167,7 @@ export default function CorridasEmAndamento() {
             {session && session.user ? (
                 <View style={styles.container}>
                     {/* Cabeçalho do Restaurante */}
-                    <View style={styles.header}>
-
-                        <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
-
-                        <TouchableOpacity onPress={() => router.push({ pathname: "/pf_entregador_lojista" })}>
-                            <View>
-
-                                <Text style={styles.restauranteNome}>
-                                    {user && user?.tipo_usuario === 1 && user?.nome_loja
-                                        ? user.nome_loja
-                                        : user && user?.tipo_usuario === 2 && user?.nome
-                                            ? user.nome : "Nome indisponível"}
-                                </Text>
-
-                                <Text style={styles.restauranteLocalizacao}>{user && user?.endereco && user?.nome || user?.nome_loja
-                                    ? user.endereco
-                                    : "Endereço indisponivel"}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                    <HeaderThreads user={user} />
 
                     <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
                     {/* Filtros */}
@@ -144,7 +188,7 @@ export default function CorridasEmAndamento() {
                     {/* Lista de Corridas */}
                     <FlatList
                         data={corridasFiltradas}
-                        renderItem={renderCorrida}
+                        renderItem={user?.tipo_usuario === 1 ? renderCorridaLojista : renderCorridaEntregador}
                         keyExtractor={item => item.id}
                         contentContainerStyle={styles.listaCorridas}
                     />
@@ -153,6 +197,56 @@ export default function CorridasEmAndamento() {
         </>
     );
 }
+
+
+// const isAtrasada = (previsao_entrega: string | null): boolean => {
+
+//     if(previsao_entrega === null){
+//         return false
+//     }
+
+//     const [horaEntrega, minutoEntrega] = previsao_entrega.split(':').map(Number);
+
+//     const agora = new Date();
+
+//     // Pega a hora e o minuto atuais
+//     const horaAtual = agora.getHours();
+//     const minutoAtual = agora.getMinutes();
+
+//     // Verifica se a hora da entrega já passou
+//     if (horaAtual > horaEntrega || (horaAtual === horaEntrega && minutoAtual > minutoEntrega)) {
+//         return true; // Está atrasada
+//     }
+
+//     return false; // Não está atrasada
+// };
+
+
+//Falta verificar melhor o problema
+const isAtrasada = (created_at: string, previsao_entrega: string | null): boolean => {
+    if (previsao_entrega === null) {
+        return false
+    }
+
+    // Cria um objeto 'moment' para a data e hora atuais
+    const agora = moment();
+
+    // Extrai a data de criação da corrida (sem a hora)
+    const dataCriacao = moment(created_at, 'YYYY-MM-DD HH:mm:ss');
+
+    // Extrai a hora e o minuto da previsão de entrega
+    const [horaEntrega, minutoEntrega] = previsao_entrega.split(':').map(Number);
+
+    // Combina a data de criação com a hora da previsão de entrega
+    const dataHoraPrevisao = dataCriacao.clone().set({
+        hour: horaEntrega,
+        minute: minutoEntrega,
+        second: 0,
+    });
+    console.log(agora.isAfter(dataHoraPrevisao))
+    // Verifica se o horário atual já ultrapassou a previsão de entrega
+    return agora.isAfter(dataHoraPrevisao);
+};
 
 const styles = StyleSheet.create({
     container: {

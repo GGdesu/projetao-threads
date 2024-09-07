@@ -1,3 +1,4 @@
+import { useUser } from '@/context/userContext';
 import React from 'react';
 import { View, Text, StyleSheet, Image, Button, TouchableOpacity, ScrollView } from 'react-native';
 
@@ -19,6 +20,9 @@ interface Shopkeeper {
 const profilePicture = require('@/assets/images/shopkeeper.jpg');
 
 const ShopkeeperProfileScreen: React.FC = ({ navigation }) => {
+  
+  const { user } = useUser();
+  
   const shopkeeper: Shopkeeper = {
     id: '1',
     name: 'Maria Souza',
@@ -47,8 +51,8 @@ const ShopkeeperProfileScreen: React.FC = ({ navigation }) => {
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
         <Image source={shopkeeper.profilePicture} style={styles.profilePicture} />
-        <Text style={styles.name}>{shopkeeper.name}</Text>
-        <Text style={styles.storeName}>{shopkeeper.storeName}</Text>
+        <Text style={styles.name}>{user?.nome_loja}</Text>
+        {/* <Text style={styles.storeName}>{shopkeeper.storeName}</Text> */}
       </View>
 
       <View style={styles.section}>
@@ -56,7 +60,7 @@ const ShopkeeperProfileScreen: React.FC = ({ navigation }) => {
         <Text style={styles.label}>Email</Text>
         <Text style={styles.info}>{shopkeeper.email}</Text>
         <Text style={styles.label}>Telefone</Text>
-        <Text style={styles.info}>{shopkeeper.phone}</Text>
+        <Text style={styles.info}>{user?.telefone}</Text>
       </View>
 
       <View style={styles.divider} />
@@ -64,11 +68,11 @@ const ShopkeeperProfileScreen: React.FC = ({ navigation }) => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Dados da Empresa</Text>
         <Text style={styles.label}>CNPJ</Text>
-        <Text style={styles.details}>{shopkeeper.cnpj}</Text>
+        <Text style={styles.details}>{user?.cnpj}</Text>
         <Text style={styles.label}>Endereço</Text>
-        <Text style={styles.details}>{shopkeeper.address}</Text>
+        <Text style={styles.details}>{user?.endereco}</Text>
         <Text style={styles.label}>Conta Bancária</Text>
-        <Text style={styles.details}>{shopkeeper.bankAccount}</Text>
+        <Text style={styles.details}>{user?.conta_bancaria}</Text>
       </View>
 
       <Button title="Editar Perfil" onPress={handleEditProfile} color="#82d982" style={styles.editButton} />
