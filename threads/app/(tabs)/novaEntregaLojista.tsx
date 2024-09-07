@@ -45,7 +45,7 @@ export default function logistaScreen() {
                 nome_lojista: user?.nome_loja,
                 telefone_lojista: user?.telefone,
                 tempo_preparo: tempoPreparo,
-                tempo_max_entrega: tempoMax,
+                previsao_entrega: "20:25",
                 endereco_entrega: endereco,
                 situacao_corrida: "ativa",
                 preco: preco,
