@@ -1,5 +1,5 @@
 import { useUser } from '@/context/userContext';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Button } from '@rneui/themed';
 import { supabase } from '@/utils/supabase';
@@ -25,6 +25,7 @@ const profilePicture = require('@/assets/images/shopkeeper.jpg');
 const ShopkeeperProfileScreen: React.FC = () => {
 
   const { user, setUser } = useUser();
+  const [email, setEmail] = useState("")
 
   const router = useRouter();
 
@@ -47,11 +48,33 @@ const ShopkeeperProfileScreen: React.FC = () => {
     //navigation.navigate('EditShopkeeperProfile');
   };
 
+  useEffect(() => {
+    getEmail()
+  })
+
+  const getEmail = async () => {
+    const { data, error } = await supabase.auth.getUser();
+  
+    if (error) {
+      console.error('Erro ao pegar o usuário:', error);
+      return;
+    }
+    
+    const email = data?.user?.email;
+  
+    if (email) {
+      console.log('Email do usuário logado:', email);
+      setEmail(email)
+    } else {
+      console.log('Nenhum usuário logado.');
+    }
+  };
+
   async function handleLogOut() {
    
 
     const {error} = await supabase.auth.signOut()
-
+    
 
     if(error){
       Alert.alert("Erro ao desconectar: ", error.message)
@@ -79,7 +102,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Informações Pessoais</Text>
         <Text style={styles.label}>Email</Text>
-        <Text style={styles.info}>{shopkeeper.email}</Text>
+        <Text style={styles.info}>{email}</Text>
         <Text style={styles.label}>Telefone</Text>
         <Text style={styles.info}>{user?.telefone}</Text>
       </View>
