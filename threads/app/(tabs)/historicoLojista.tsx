@@ -48,7 +48,8 @@ export default function historicoScreen() {
           const { data, error } = await supabase
             .from('entrega') // Nome da tabela
             .select('*')
-            .eq('lojista_id', userId); // Filtra as entregas pelo ID do usuário
+            .eq('lojista_id', userId)
+            .eq('situacao_corrida', 'finalizada');
   
           if (error) {
             throw error;

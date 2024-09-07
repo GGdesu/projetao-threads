@@ -2,7 +2,7 @@ import { supabase } from '@/utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-
+import { Button } from 'react-native';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import LoginScreen from '../login';
 import { getActiveUser, getActiveUserData } from '@/utils/supabaseUtils';
@@ -34,13 +34,57 @@ export default function TelaInicial() {
 
         getUser()
     }, [])
+    
+    useEffect(() => {
+        const fetchUser = async () => {
+            const userData = await getUser();
+            if (userData) {
+                setUser(userData);
+            }
+        };
 
-    // if (loading) {
-    //     console.log("tela de loading")
-    //     return <ActivityIndicator size={"large"} color={"0000ff"} />
-    // }
+        fetchUser();
+    }, []);
 
-    const corridas: Corrida[] = [];
+    const [corridas, setCorridas] = useState<Corrida[]>([]);
+
+    useEffect(() => {      
+        const fetchEntregas = async () => {
+          try {
+            // Obtendo o usuário logado
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+            if (sessionError) {
+              throw sessionError;
+            }
+      
+            const userId = sessionData.session?.user.id; // Obtendo o ID do usuário logado
+      
+            if (!userId) {
+              console.error('Usuário não está logado');
+              return;
+            }
+      
+            // Buscando entregas do entregador logado
+            const { data, error } = await supabase
+              .from('entrega') // Nome da tabela
+              .select('*')
+              .eq('situacao_corrida', 'ativa'); 
+      
+            if (error) {
+              throw error;
+            }
+      
+            // Populando a lista de corridas
+            corridas.push(...(data as Corrida[]));
+            
+          } catch (error) {
+            console.error('Erro ao buscar entregas:', error);
+          }
+        };
+      
+        fetchEntregas();
+      }, []);
 
     //pegar infos do banco de dados
     async function getUser() {
@@ -67,25 +111,93 @@ export default function TelaInicial() {
 
     }
 
+    const [situacaoCorrida, setSituacaoCorrida] = useState<null | string>(null);
 
-    const corridasFiltradas = corridas.filter(corrida =>
-        filtro === 'Todas' || (filtro === 'Atrasadas' && corrida.atrasada)
-    );
+    const aceitarCorrida = async (corridaId: string) => {
+        try {
+            // Verifique se o usuário está disponível no contexto
+            if (!user || !user.id) {
+                console.error('Usuário não está autenticado ou não possui um ID válido');
+                return;
+            }
+    
+            // Verificar se o usuário já existe na tabela 'usuario'
+            const { data: usuario, error: erroVerificacao } = await supabase
+                .from('usuario')
+                .select('id')
+                .eq('id', user.id)
+                .single(); // Use single para garantir que esperamos apenas um resultado
+    
+            if (erroVerificacao) {
+                console.error('Erro ao verificar a existência do usuário na tabela usuario:', erroVerificacao);
+                return;
+            }
+    
+            if (!usuario) {
+                console.error('Usuário não encontrado na tabela usuario.');
+                return;
+            }
+    
+            // Atualizar a corrida com o ID do entregador na tabela `entrega`
+            const { data, error } = await supabase
+                .from('entrega')
+                .update({
+                    situacao_corrida: 'andamento',
+                    entregador_id: user.entregador_id,  
+                    nome_entregador: user.nome || 'Nome do Entregador', 
+                    telefone_entregador: user.telefone || 'Telefone do Entregador' 
+                })
+                .eq('id', corridaId);
+    
+            if (error) {
+                console.error('Erro ao atualizar a corrida:', error);
+                return;
+            }
+    
+            console.log('Corrida atualizada com sucesso:', data);
+    
+            // Chame a função de atualização para garantir que a lista seja atualizada
+            await atualizarCorridas();
+        } catch (error) {
+            console.error('Erro ao aceitar corrida:', error);
+        }
+    };    
+
+    const atualizarCorridas = async () => {
+        try {
+            // Fazendo a busca apenas das corridas ativas
+            const { data, error } = await supabase
+                .from('entrega')
+                .select('*')
+                .eq('situacao_corrida', 'ativa');  // Filtrando para obter apenas corridas ativas
+    
+            if (error) {
+                throw error;
+            }
+    
+            // Atualiza o estado com as novas corridas, substituindo as antigas
+            setCorridas(data as Corrida[]);
+        } catch (error) {
+            console.error('Erro ao atualizar corridas:', error);
+        }
+    };
 
     const renderCorrida = ({ item }: { item: Corrida }) => (
-        <TouchableOpacity style={[styles.card, item.atrasada && styles.cardAtrasada]}
+        <TouchableOpacity
+            key={item.id}  // Usar o ID da corrida como chave, que é único
+            style={[styles.card, item.atrasada && styles.cardAtrasada]}
             onPress={() => router.push({
                 pathname: "/detalheAndamentoLojista",
                 params: { corridaId: item.id }
             })}>
             <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />
             <View style={styles.cardInfo}>
-                <Text style={styles.entregadorNome}>Entregador: <Text style={styles.boldText}>{item.nome_entregador}</Text></Text>
+                <Text style={styles.entregadorNome}>Lojista: <Text style={styles.boldText}>{item.nome_lojista}</Text></Text>
                 <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
                 <Text style={styles.cardText}>Previsão de entrega: {item.previsaoEntrega}</Text>
             </View>
             <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.acceptButton} onPress={() => {/* Função para aceitar */ }}>
+                <TouchableOpacity style={styles.acceptButton} onPress={() => aceitarCorrida(item.id)}>
                     <FontAwesome name="check" size={20} color="#fff" />
                 </TouchableOpacity>
             </View>
@@ -119,24 +231,10 @@ export default function TelaInicial() {
                     </View>
 
                     <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
-                    {/* Filtros */}
-                    {/* <View style={styles.filtros}>
-
-                        <TouchableOpacity
-                            style={[styles.filtroButton, filtro === 'Todas' && styles.filtroButtonAtivo]}
-                            onPress={() => setFiltro('Todas')}>
-                            <Text style={filtro === 'Todas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Todas</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.filtroButton, filtro === 'Atrasadas' && styles.filtroButtonAtivo]}
-                            onPress={() => setFiltro('Atrasadas')}>
-                            <Text style={filtro === 'Atrasadas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Atrasadas</Text>
-                        </TouchableOpacity>
-                    </View> */}
-
+                    <Button title="Atualizar" onPress={atualizarCorridas} />
                     {/* Lista de Corridas */}
                     <FlatList
-                        data={corridasFiltradas}
+                        data={corridas}
                         renderItem={renderCorrida}
                         keyExtractor={item => item.id}
                         contentContainerStyle={styles.listaCorridas}
@@ -246,11 +344,5 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 10,
         marginLeft: 10,
-    },
-    rejectButton: {
-        backgroundColor: 'red',
-        borderRadius: 20,
-        padding: 10,
-        marginLeft: 10,
-    },
+    },    
 });
