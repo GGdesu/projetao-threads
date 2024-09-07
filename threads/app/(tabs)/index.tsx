@@ -31,9 +31,14 @@ export default function CorridasEmAndamento() {
         })
 
         getUser()
-        
-        
+
+
     }, [])
+
+    //pegar Entregas
+    useEffect(() => {
+        getCorridas()
+    }, [user])
 
     //pegar infos do banco de dados
     async function getUser() {
@@ -48,9 +53,6 @@ export default function CorridasEmAndamento() {
 
             if (userData) {
                 setUser(userData)
-                //assim que ele consegue pegar o usuario ele pega a as corridas
-                getCorridas()
-                
 
             }
             //console.log(userData)
@@ -94,9 +96,6 @@ export default function CorridasEmAndamento() {
 
             console.log("tentou pegar as corridas")
 
-
-
-
         } catch (error) {
             console.log("erro na função getCorridas: ", error)
             return null
@@ -128,7 +127,7 @@ export default function CorridasEmAndamento() {
     const corridasFiltradas = corridas?.filter(corrida => {
         const isAtrasadaEntrega = isAtrasada(corrida?.created_at, corrida?.previsao_entrega);
         const situacaoValida = corrida?.situacao_corrida === "andamento" || corrida?.situacao_corrida === "ativa";
-    
+
         return (filtro === 'Todas' || (filtro === 'Atrasadas' && isAtrasadaEntrega)) && situacaoValida;
     })
 
@@ -136,7 +135,7 @@ export default function CorridasEmAndamento() {
         <TouchableOpacity style={[styles.card, isAtrasada(item?.created_at, item.previsao_entrega) && styles.cardAtrasada]}
             onPress={() => router.push({
                 pathname: "/detalheAndamentoLojista",
-                params: { corridaID: item?.id , atrasada: isAtrasada(item?.created_at, item.previsao_entrega) ? "Atrasada" : "Em Tempo"}
+                params: { corridaID: item?.id, atrasada: isAtrasada(item?.created_at, item.previsao_entrega) ? "Atrasada" : "Em Tempo" }
             })}>
             {/* <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} /> */}
             <View style={styles.cardInfo}>
@@ -191,6 +190,9 @@ export default function CorridasEmAndamento() {
                         renderItem={user?.tipo_usuario === 1 ? renderCorridaLojista : renderCorridaEntregador}
                         keyExtractor={item => item.id}
                         contentContainerStyle={styles.listaCorridas}
+                        ListEmptyComponent={
+                            <Text style={styles.emptyMessage}>Nenhuma entrega realizada ainda.</Text>
+                        }
                     />
                 </View>
             ) : (<LoginScreen />)}
@@ -243,7 +245,7 @@ const isAtrasada = (created_at: string, previsao_entrega: string | null): boolea
         minute: minutoEntrega,
         second: 0,
     });
-    console.log(agora.isAfter(dataHoraPrevisao))
+    //console.log(agora.isAfter(dataHoraPrevisao))
     // Verifica se o horário atual já ultrapassou a previsão de entrega
     return agora.isAfter(dataHoraPrevisao);
 };
@@ -327,5 +329,11 @@ const styles = StyleSheet.create({
     },
     boldText: {
         fontWeight: 'bold',
+    },
+    emptyMessage: {
+        textAlign: 'center',
+        marginTop: 20,
+        fontSize: 16,
+        color: '#999',
     },
 });

@@ -1,6 +1,9 @@
 import { useUser } from '@/context/userContext';
 import React from 'react';
-import { View, Text, StyleSheet, Image, Button, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Button } from '@rneui/themed';
+import { supabase } from '@/utils/supabase';
+import { useRouter } from 'expo-router';
 
 interface Shopkeeper {
   id: string;
@@ -19,10 +22,12 @@ interface Shopkeeper {
 // Importando a imagem de perfil localmente com caminho relativo
 const profilePicture = require('@/assets/images/shopkeeper.jpg');
 
-const ShopkeeperProfileScreen: React.FC = ({ navigation }) => {
-  
-  const { user } = useUser();
-  
+const ShopkeeperProfileScreen: React.FC = () => {
+
+  const { user, setUser } = useUser();
+
+  const router = useRouter();
+
   const shopkeeper: Shopkeeper = {
     id: '1',
     name: 'Maria Souza',
@@ -39,12 +44,28 @@ const ShopkeeperProfileScreen: React.FC = ({ navigation }) => {
 
   const handleEditProfile = () => {
     // Navega para a tela de edição do perfil
-    navigation.navigate('EditShopkeeperProfile');
+    //navigation.navigate('EditShopkeeperProfile');
   };
+
+  async function handleLogOut() {
+   
+
+    const {error} = await supabase.auth.signOut()
+
+
+    if(error){
+      Alert.alert("Erro ao desconectar: ", error.message)
+    }else{
+      setUser(null); // Limpar o usuário no contexto
+      Alert.alert("Sucesso", "Voce foi desconectado!")
+      router.navigate('/')
+    }
+    
+  }
 
   const handleViewFullHistory = () => {
     // Navega para a tela de histórico completo de entregas
-    navigation.navigate('FullDeliveryHistory');
+    //navigation.navigate('FullDeliveryHistory');
   };
 
   return (
@@ -75,16 +96,56 @@ const ShopkeeperProfileScreen: React.FC = ({ navigation }) => {
         <Text style={styles.details}>{user?.conta_bancaria}</Text>
       </View>
 
-      <Button title="Editar Perfil" onPress={handleEditProfile} color="#82d982" style={styles.editButton} />
+      <View style={{ alignItems: 'center' }}>
+        <Button
+          title="Editar perfil"
+          //onPress={handleEditProfile}
+          buttonStyle={{ 
+            backgroundColor: 'rgba(127, 220, 103, 1)',
+            borderRadius: 10  
+          }}
+          containerStyle={{
+            height: 40,
+            width: '90%',
+            marginHorizontal: 10,
+            //marginVertical: 0,
 
-      <View style={styles.deliveryHistory}>
+
+          }}
+          titleStyle={{
+            color: 'white',
+            marginHorizontal: 20,
+          }}
+        />
+        <Button
+          title="Sair"
+          onPress={handleLogOut}
+          buttonStyle={{ 
+            backgroundColor: 'rgba(127, 220, 103, 1)',
+            borderRadius: 10 }}
+          
+          containerStyle={{
+            height: 40,
+            width: '90%',
+            marginHorizontal: 10,
+            marginVertical: 20,
+          }}
+          titleStyle={{
+            color: 'white',
+            marginHorizontal: 20,
+          }}
+        />
+      </View>
+
+
+      {/* <View style={styles.deliveryHistory}>
         <Text style={styles.sectionTitle}>Histórico de Entregas</Text>
         <Text style={styles.historyDetails}>Número de Entregas Realizadas: {shopkeeper.deliveries}</Text>
         <Text style={styles.historyDetails}>Total Gasto: {shopkeeper.totalSpent}</Text>
         <TouchableOpacity onPress={handleViewFullHistory}>
           <Text style={styles.link}>Ver Histórico Completo</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </ScrollView>
   );
 };
@@ -165,6 +226,10 @@ const styles = StyleSheet.create({
     color: '#82d982',
     fontSize: 16,
     marginTop: 8,
+  },
+  sairButton: {
+    marginTop: 23,
+    padding: 40
   },
 });
 

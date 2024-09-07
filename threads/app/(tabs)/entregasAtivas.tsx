@@ -76,13 +76,13 @@ export default function TelaInicial() {
         <TouchableOpacity style={[styles.card, item.atrasada && styles.cardAtrasada]}
             onPress={() => router.push({
                 pathname: "/detalheAndamentoLojista",
-                params: { corridaId: item.id }
+                params: { corridaID: item.id }
             })}>
             <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />
             <View style={styles.cardInfo}>
                 <Text style={styles.entregadorNome}>Entregador: <Text style={styles.boldText}>{item.nome_entregador}</Text></Text>
                 <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
-                <Text style={styles.cardText}>Previsão de entrega: {item.previsaoEntrega}</Text>
+                <Text style={styles.cardText}>Previsão de entrega: {item.previsao_entrega}</Text>
             </View>
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity style={styles.acceptButton} onPress={() => {/* Função para aceitar */ }}>
@@ -121,7 +121,7 @@ export default function TelaInicial() {
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
+                    <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Ativas</Text>
                     {/* Filtros */}
                     {/* <View style={styles.filtros}>
 

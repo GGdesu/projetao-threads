@@ -1,4 +1,4 @@
-import { UserData } from "./dataInterface";
+import { Corrida, UserData } from "./dataInterface";
 
 import { supabase } from "./supabase"
 
@@ -142,6 +142,31 @@ export async function getActiveDelivers() {
     } catch (error) {
         console.log("foi encontrado um erro ao executar codigo: ", error)
     }
+}
+
+export async function updateDeliverSituation(id: string | undefined, situacao_corrida: string) {
+    try {
+
+        if(id === undefined){
+            console.log("ID indefinido")
+            return null
+        }
+        const { error } = await supabase
+        .from('entrega')
+        .update({"situacao_corrida": situacao_corrida})
+        .eq("id", id)
+
+        if(error){
+            console.log("Ocorreu um erro ao atualizar a situação da corrida: ", error.message)
+        }else{
+            console.log("Situação atualizada com sucesso")
+        }
+        
+    } catch (error) {
+        console.log("erro capturado: ", error)
+        
+    }
+    
 }
 
 export async function updateActiveDelivers() {

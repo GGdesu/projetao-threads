@@ -1,14 +1,20 @@
 import { useUser } from '@/context/userContext';
+import { formatarDataHoraISO } from '@/utils/misc';
+import { getDelivers, updateDeliverSituation } from '@/utils/supabaseUtils';
 import { FontAwesome } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { Button } from '@rneui/base';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
 
 export default function DetalhesDaCorrida() {
 
-    const { corridas } = useUser(); // A lista de corridas vinda do contexto
-    const {  corridaID, atrasada } = useLocalSearchParams(); // Pegando o ID da corrida da URL
+    const { corridas, setCorridas } = useUser(); // A lista de corridas vinda do contexto
+    const { corridaID, atrasada } = useLocalSearchParams(); // Pegando o ID da corrida da URL
     const { user } = useUser();
+    const router = useRouter();
+
+    const [disable, setDisable] = useState(false);
 
     // Encontrando a corrida específica com base no id
     const corrida = corridas?.find(corrida => corrida.id === corridaID);
@@ -37,6 +43,74 @@ export default function DetalhesDaCorrida() {
         }
         return stars;
     };
+
+
+    async function handleCancelarCorrida() {
+        try {
+            await updateDeliverSituation(corrida?.id, "cancelada")
+            Alert.alert("Corrida Cancelada")
+            getCorridas()
+            router.navigate("/(tabs)/")
+
+        } catch (error) {
+            console.log("Foi Capturado um erro: ", error)
+
+        }
+    }
+    
+    //console.log(index)
+
+    async function handleFinalizarCorrida() {
+        try {
+            await updateDeliverSituation(corrida?.id, "finalizada")
+            Alert.alert("Corrida Finalizada")
+            getCorridas()
+
+            router.navigate("/(tabs)/")
+            setDisable(true)
+
+        } catch (error) {
+            console.log("Foi Capturado um erro: ", error)
+
+        }
+
+    }
+
+    async function getCorridas() {
+        try {
+    
+            if (user?.tipo_usuario === 1) {
+                const userCorrida = await getDelivers("lojista_id", user?.lojista_id)
+    
+                if (!userCorrida) {
+                    console.log("erro ao tentar receber dados na variavel userCorrida: ", userCorrida)
+                    return null
+                }
+    
+                if (userCorrida) {
+                    setCorridas(userCorrida)
+                }
+    
+            } else if (user?.tipo_usuario === 2) {
+                const userCorrida = await getDelivers("entregador_id", user?.entregador_id)
+    
+                if (!userCorrida) {
+                    console.log("erro ao tentar receber dados na variavel userCorrida: ", userCorrida)
+                    return null
+                }
+    
+                if (userCorrida) {
+                    setCorridas(userCorrida)
+                }
+            }
+    
+            console.log("tentou pegar as corridas")
+    
+        } catch (error) {
+            console.log("erro na função getCorridas: ", error)
+            return null
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -84,6 +158,50 @@ export default function DetalhesDaCorrida() {
                 <Text><Text style={styles.boldText}>Endereço de Entrega:</Text> {corrida.endereco_entrega}</Text>
             </View>
 
+            <View style={{ alignItems: 'center' }}>
+                <Button
+                    title="Finalizar Corrida"
+                    onPress={handleFinalizarCorrida}
+                    disabled={disable}
+                    buttonStyle={{
+                        backgroundColor: 'rgba(127, 220, 103, 1)',
+                        borderRadius: 10
+                    }}
+                    containerStyle={{
+                        height: 40,
+                        width: '90%',
+                        marginHorizontal: 10,
+                        //marginVertical: 0,
+
+
+                    }}
+                    titleStyle={{
+                        color: 'white',
+                        marginHorizontal: 20,
+                    }}
+                />
+                <Button
+                    title="Cancelar Corrida"
+                    onPress={handleCancelarCorrida}
+                    disabled={disable}
+                    buttonStyle={{
+                        backgroundColor: 'rgba(127, 220, 103, 1)',
+                        borderRadius: 10
+                    }}
+
+                    containerStyle={{
+                        height: 40,
+                        width: '90%',
+                        marginHorizontal: 10,
+                        marginVertical: 20,
+                    }}
+                    titleStyle={{
+                        color: 'white',
+                        marginHorizontal: 20,
+                    }}
+                />
+            </View>
+
             {/* Botões Aceitar e Recusar */}
             {/* <View style={styles.buttonContainer}>
                 <TouchableOpacity style={[styles.button, styles.acceptButton]}>
@@ -97,39 +215,8 @@ export default function DetalhesDaCorrida() {
     );
 }
 
-const formatarDataHoraISO = (created_at: string): string => {
-    const data = new Date(created_at);
 
-    // Verifica se a data é válida
-    if (isNaN(data.getTime())) {
-        console.log(created_at)
-        return "Data inválida";
-    }
 
-    // Formatar a data e a hora no formato desejado
-    const dia = String(data.getUTCDate()).padStart(2, '0');
-    const mes = String(data.getUTCMonth() + 1).padStart(2, '0'); // Janeiro é 0
-    const ano = data.getUTCFullYear();
-
-    const horas = String(data.getUTCHours()).padStart(2, '0');
-    const minutos = String(data.getUTCMinutes()).padStart(2, '0');
-    console.log(`${dia}/${mes}/${ano} às ${horas}:${minutos}`)
-
-    return `${dia}/${mes}/${ano} às ${horas}:${minutos}`;
-    
-    // const data = new Date(created_at);
-
-    // // Formatar a data e a hora no formato desejado
-    // const dia = String(data.getDate()).padStart(2, '0');
-    // const mes = String(data.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
-    // const ano = data.getFullYear();
-
-    // const horas = String(data.getHours()).padStart(2, '0');
-    // const minutos = String(data.getMinutes()).padStart(2, '0');
-    // console.log(`${dia}/${mes}/${ano} às ${horas}:${minutos}`)
-
-    // return `${dia}/${mes}/${ano} às ${horas}:${minutos}`;
-}
 
 
 const styles = StyleSheet.create({
