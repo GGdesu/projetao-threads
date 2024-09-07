@@ -195,6 +195,7 @@ export default function TelaInicial() {
                 <Text style={styles.entregadorNome}>Lojista: <Text style={styles.boldText}>{item.nome_lojista}</Text></Text>
                 <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
                 <Text style={styles.cardText}>Previsão de entrega: {item.previsaoEntrega}</Text>
+                <Text style={styles.cardText}>Preço: {item.preco}</Text>
             </View>
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity style={styles.acceptButton} onPress={() => aceitarCorrida(item.id)}>
