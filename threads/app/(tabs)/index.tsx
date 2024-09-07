@@ -3,8 +3,9 @@ import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import LoginScreen from './login';
-import { getActiveUser, getActiveUserData } from '@/utils/supabaseUtils';
+import LoginScreen from '@/app/login';
+import { useUser } from '@/context/userContext';
+import { getActiveUserData } from '@/utils/supabaseUtils';
 
 interface Corrida {
     id: string;
@@ -16,9 +17,11 @@ interface Corrida {
 
 export default function CorridasEmAndamento() {
     const router = useRouter()
-
     const [filtro, setFiltro] = useState('Todas');
-    const [userData, setUserData] = useState<any[] | null>(null);
+
+    //pegando a informação do usuario atravez do contexto
+    const { user, setUser } = useUser()
+
     const [session, setSession] = useState<Session | null>(null);
 
     useEffect(() => {
@@ -31,7 +34,33 @@ export default function CorridasEmAndamento() {
         })
 
         getUser()
+
     }, [])
+
+    //pegar infos do banco de dados
+    async function getUser() {
+        try {
+
+            const userData = await getActiveUserData()
+
+            if (!userData) {
+                console.log("erro ao pegar dados do usuario")
+                return null
+            }
+
+            if (userData) {
+                setUser(userData)
+            }
+            //console.log(userData)
+            //setLoading(false)
+
+        } catch (error) {
+            console.log(error)
+            return null
+
+        }
+
+    }
 
     const corridas: Corrida[] = [
         {
@@ -50,25 +79,6 @@ export default function CorridasEmAndamento() {
         },
         // Adicione mais corridas aqui
     ];
-
-    //pegar infos do banco de dados
-    async function getUser() {
-        try {
-
-            const userData = await getActiveUserData()
-            if (userData) {
-                setUserData(userData);
-            } else {
-                setUserData(null);
-            }
-            console.log(userData)
-
-        } catch (error) {
-            console.log(error)
-        }
-
-    }
-
 
     const corridasFiltradas = corridas.filter(corrida =>
         filtro === 'Todas' || (filtro === 'Atrasadas' && corrida.atrasada)
@@ -94,14 +104,25 @@ export default function CorridasEmAndamento() {
             {session && session.user ? (
                 <View style={styles.container}>
                     {/* Cabeçalho do Restaurante */}
-
                     <View style={styles.header}>
 
                         <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
-                        <View>
-                            <Text style={styles.restauranteNome}>Restaurante ABC</Text>
-                            <Text style={styles.restauranteLocalizacao}>Localização</Text>
-                        </View>
+
+                        <TouchableOpacity onPress={() => router.push({ pathname: "/pf_entregador_lojista" })}>
+                            <View>
+
+                                <Text style={styles.restauranteNome}>
+                                    {user && user?.tipo_usuario === 1 && user?.nome_loja
+                                        ? user.nome_loja
+                                        : user && user?.tipo_usuario === 2 && user?.nome
+                                            ? user.nome : "Nome indisponível"}
+                                </Text>
+
+                                <Text style={styles.restauranteLocalizacao}>{user && user?.endereco && user?.nome || user?.nome_loja
+                                    ? user.endereco
+                                    : "Endereço indisponivel"}</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
 
                     <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>

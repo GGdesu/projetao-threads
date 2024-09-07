@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 
 export default function DetalhesDaCorrida() {
 
@@ -27,7 +27,7 @@ export default function DetalhesDaCorrida() {
             </View>
 
             {/* Seção de Previsão */}
-            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <Text style={styles.subTitle}>Previsão: 23:02</Text>
                 <View style={styles.headerRight}>
                     <Text style={styles.raceNumber}>Nº 1136</Text>
@@ -46,7 +46,10 @@ export default function DetalhesDaCorrida() {
                 />
                 <View style={styles.delivererInfo}>
                     <Text>Entregador: <Text style={styles.delivererName}>Pedro</Text></Text>
-                    <Text>Telefone: <Text style={styles.delivererPhone}>(81) 99999-9999</Text></Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(`tel:${'(81) 99999-9999'}`)}>
+                        <Text>Telefone: <Text style={styles.delivererPhone}>(81) 99999-9999</Text></Text>
+                    </TouchableOpacity>
+
                     <Text>{renderStars(5)}</Text>{/* Substitua por um componente de avaliação real */}
                 </View>
             </View>
@@ -61,6 +64,16 @@ export default function DetalhesDaCorrida() {
                 <Text><Text style={styles.boldText}>Coleta:</Text> 22:32</Text>
                 <Text><Text style={styles.boldText}>Endereço:</Text> Rua Lorem ipsum dolor sit amet, 03</Text>
             </View>
+
+            {/* Botões Aceitar e Recusar */}
+            {/* <View style={styles.buttonContainer}>
+                <TouchableOpacity style={[styles.button, styles.acceptButton]}>
+                    <Text style={styles.buttonText}>Aceitar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, styles.declineButton]}>
+                    <Text style={styles.buttonText}>Recusar</Text>
+                </TouchableOpacity>
+            </View> */}
         </View>
     );
 }
@@ -137,4 +150,28 @@ const styles = StyleSheet.create({
     boldText: {
         fontWeight: 'bold',
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    button: {
+        flex: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    acceptButton: {
+        backgroundColor: '#28a745',
+        marginRight: 10,
+    },
+    declineButton: {
+        backgroundColor: '#dc3545',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 });

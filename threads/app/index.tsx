@@ -6,9 +6,9 @@ export default function Index() {
 
     return (
         <View style={styles.container}>
-            <Image source={require("../assets/images/react-logo.png")} />
-            <Text style={styles.texto}>Otimizando</Text>
-            <Text style={styles.textoNegrito}>Entregas</Text>
+            <Image source={require("@/assets/images/react-logo.png")} />
+            <Text style={styles.texto}>Threads</Text>
+            <Text style={styles.textoNegrito}>Otimizando Suas Entregas</Text>
 
             <TouchableOpacity
                 style={styles.entrarB}
@@ -17,6 +17,7 @@ export default function Index() {
                 <Text style={styles.textoEntrar}>Entrar</Text>
             </TouchableOpacity>
 
+            
             {/* <Link href='/cadastro' asChild>
       <TouchableOpacity style={styles.entrarB} >
         <Text style={styles.textoEntrar}>Entrar</Text>
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
     textoNegrito: {
         color: "#FFF",
         fontWeight: "bold",
-        fontSize: 29,
+        fontSize: 20,
         lineHeight: 33,
         marginBottom: 50,
     },
