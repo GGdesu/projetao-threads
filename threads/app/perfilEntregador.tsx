@@ -32,9 +32,8 @@ const ShopkeeperProfileScreen: React.FC = () => {
   // };
 
   const handleEditProfile = () => {
-    // Navega para a tela de edição do perfil
-    //navigation.navigate('EditShopkeeperProfile');
-  };
+    router.navigate("/editarPerfilEntregador")
+  }
 
   useEffect(() => {
     getEmail()
@@ -74,11 +73,6 @@ const ShopkeeperProfileScreen: React.FC = () => {
     
   }
 
-  const handleViewFullHistory = () => {
-    // Navega para a tela de histórico completo de entregas
-    //navigation.navigate('FullDeliveryHistory');
-  };
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
@@ -99,10 +93,16 @@ const ShopkeeperProfileScreen: React.FC = () => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Outros Dados</Text>
+        <Text style={styles.label}>RG</Text>
+        <Text style={styles.details}>{user?.rg}</Text>
+        <Text style={styles.label}>Data de nascimento</Text>
+        <Text style={styles.details}>{user?.data_nascimento}</Text>
         <Text style={styles.label}>CNH</Text>
         <Text style={styles.details}>{user?.cnh}</Text>
         <Text style={styles.label}>Endereço</Text>
         <Text style={styles.details}>{user?.endereco}</Text>
+        <Text style={styles.label}>Veiculo</Text>
+        <Text style={styles.details}>{user?.veiculo}</Text>
         <Text style={styles.label}>Conta Bancária</Text>
         <Text style={styles.details}>{user?.conta_bancaria}</Text>
       </View>
@@ -110,7 +110,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
       <View style={{ alignItems: 'center' }}>
         <Button
           title="Editar perfil"
-          //onPress={handleEditProfile}
+          onPress={handleEditProfile}
           buttonStyle={{ 
             backgroundColor: 'rgba(127, 220, 103, 1)',
             borderRadius: 10  

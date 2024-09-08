@@ -1,10 +1,13 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useUser } from '@/context/userContext';
 
 
-const HeaderThreads: React.FC<HeaderProps> = ({ user }) => {
+const HeaderThreads: React.FC<HeaderProps> = ({ user: userParam }) => {
     const router = useRouter();
+
+    const { user } = useUser();
 
     return (
         <View style={styles.header}>
@@ -12,22 +15,25 @@ const HeaderThreads: React.FC<HeaderProps> = ({ user }) => {
 
             <TouchableOpacity
                 onPress={() =>
-                    user?.tipo_usuario === 1
-                        ? router.push({ pathname: "/perfilLojista" })
-                        : router.push({ pathname: "/perfilEntregador" })
+                    userParam?.tipo_usuario === 1
+                        ? router.push({ pathname: "/perfilLojista" }) 
+                        : userParam?.tipo_usuario === 2
+                        ? router.push({ pathname: "/perfilEntregador" })
+                        : Alert.alert("nenhuma rota, contexto sem informaçao do usuario: ",  user?.id)
+                        
                 }
             >
                 <View>
                     <Text style={styles.restauranteNome}>
-                        {user?.tipo_usuario === 1 && user?.nome_loja
-                            ? user.nome_loja
-                            : user?.tipo_usuario === 2 && user?.nome
-                                ? user.nome
+                        {userParam?.tipo_usuario === 1 && userParam?.nome_loja
+                            ? userParam.nome_loja
+                            : userParam?.tipo_usuario === 2 && userParam?.nome
+                                ? userParam.nome
                                 : "Nome indisponível"}
                     </Text>
                     <Text style={styles.restauranteLocalizacao}>
-                        {user?.endereco
-                            ? user.endereco
+                        {userParam?.endereco
+                            ? userParam.endereco
                             : "Endereço indisponível"}
                     </Text>
                 </View>
