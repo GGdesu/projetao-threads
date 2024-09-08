@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } fr
 import { Button } from '@rneui/themed';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'expo-router';
+import { formatCnpj } from '@/utils/mask';
 
 interface Shopkeeper {
   id: string;
@@ -112,7 +113,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Dados da Empresa</Text>
         <Text style={styles.label}>CNPJ</Text>
-        <Text style={styles.details}>{user?.cnpj}</Text>
+        <Text style={styles.details}>{formatCnpj(user?.cnpj.toString())}</Text>
         <Text style={styles.label}>Endereço</Text>
         <Text style={styles.details}>{user?.endereco}</Text>
         <Text style={styles.label}>Conta Bancária</Text>
