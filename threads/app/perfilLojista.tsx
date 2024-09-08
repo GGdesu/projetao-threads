@@ -44,17 +44,16 @@ const ShopkeeperProfileScreen: React.FC = () => {
     totalSpent: 'R$ 4.500,00',
   };
 
-  const handleEditProfile = () => {
-    // Navega para a tela de edição do perfil
-    //navigation.navigate('EditShopkeeperProfile');
-  };
 
   useEffect(() => {
     getEmail()
   })
 
+  
+
   const getEmail = async () => {
     const { data, error } = await supabase.auth.getUser();
+    //console.log(user)
   
     if (error) {
       console.error('Erro ao pegar o usuário:', error);
@@ -70,6 +69,10 @@ const ShopkeeperProfileScreen: React.FC = () => {
       console.log('Nenhum usuário logado.');
     }
   };
+
+  const handleEditProfile = () => {
+    router.navigate("/editarPerfilLojista")
+  }
 
   async function handleLogOut() {
    
@@ -87,11 +90,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
     
   }
 
-  const handleViewFullHistory = () => {
-    // Navega para a tela de histórico completo de entregas
-    //navigation.navigate('FullDeliveryHistory');
-  };
-
+  
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
@@ -123,7 +122,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
       <View style={{ alignItems: 'center' }}>
         <Button
           title="Editar perfil"
-          //onPress={handleEditProfile}
+          onPress={handleEditProfile}
           buttonStyle={{ 
             backgroundColor: 'rgba(127, 220, 103, 1)',
             borderRadius: 10  

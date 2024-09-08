@@ -17,24 +17,23 @@ const ShopkeeperProfileScreen: React.FC = () => {
 
   const router = useRouter();
 
-  const shopkeeper: Shopkeeper = {
-    id: '1',
-    name: 'Maria Souza',
-    email: 'maria.souza@lojista.com',
-    phone: '(11) 91234-5678',
-    storeName: 'Loja da Maria',
-    profilePicture: profilePicture,
-    cnpj: '12.345.678/0001-99',
-    address: 'Rua das Flores, 123, São Paulo, SP',
-    bankAccount: 'Banco XYZ - Ag: 1234 - C/C: 56789-0',
-    deliveries: 120,
-    totalSpent: 'R$ 4.500,00',
-  };
+  // const shopkeeper: Shopkeeper = {
+  //   id: '1',
+  //   name: 'Maria Souza',
+  //   email: 'maria.souza@lojista.com',
+  //   phone: '(11) 91234-5678',
+  //   storeName: 'Loja da Maria',
+  //   profilePicture: profilePicture,
+  //   cnpj: '12.345.678/0001-99',
+  //   address: 'Rua das Flores, 123, São Paulo, SP',
+  //   bankAccount: 'Banco XYZ - Ag: 1234 - C/C: 56789-0',
+  //   deliveries: 120,
+  //   totalSpent: 'R$ 4.500,00',
+  // };
 
   const handleEditProfile = () => {
-    // Navega para a tela de edição do perfil
-    //navigation.navigate('EditShopkeeperProfile');
-  };
+    router.navigate("/editarPerfilEntregador")
+  }
 
   useEffect(() => {
     getEmail()
@@ -74,15 +73,10 @@ const ShopkeeperProfileScreen: React.FC = () => {
     
   }
 
-  const handleViewFullHistory = () => {
-    // Navega para a tela de histórico completo de entregas
-    //navigation.navigate('FullDeliveryHistory');
-  };
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image source={shopkeeper.profilePicture} style={styles.profilePicture} />
+        <Image source={profilePicture} style={styles.profilePicture} />
         <Text style={styles.name}>{user?.nome}</Text>
         {/* <Text style={styles.storeName}>{shopkeeper.storeName}</Text> */}
       </View>
@@ -99,10 +93,16 @@ const ShopkeeperProfileScreen: React.FC = () => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Outros Dados</Text>
+        <Text style={styles.label}>RG</Text>
+        <Text style={styles.details}>{user?.rg}</Text>
+        <Text style={styles.label}>Data de nascimento</Text>
+        <Text style={styles.details}>{user?.data_nascimento}</Text>
         <Text style={styles.label}>CNH</Text>
         <Text style={styles.details}>{user?.cnh}</Text>
         <Text style={styles.label}>Endereço</Text>
         <Text style={styles.details}>{user?.endereco}</Text>
+        <Text style={styles.label}>Veiculo</Text>
+        <Text style={styles.details}>{user?.veiculo}</Text>
         <Text style={styles.label}>Conta Bancária</Text>
         <Text style={styles.details}>{user?.conta_bancaria}</Text>
       </View>
@@ -110,7 +110,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
       <View style={{ alignItems: 'center' }}>
         <Button
           title="Editar perfil"
-          //onPress={handleEditProfile}
+          onPress={handleEditProfile}
           buttonStyle={{ 
             backgroundColor: 'rgba(127, 220, 103, 1)',
             borderRadius: 10  
