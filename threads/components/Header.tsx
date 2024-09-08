@@ -14,7 +14,7 @@ const HeaderThreads: React.FC<HeaderProps> = ({ user }) => {
                 onPress={() =>
                     user?.tipo_usuario === 1
                         ? router.push({ pathname: "/perfilLojista" })
-                        : router.push({ pathname: "/pf_entregador_lojista" })
+                        : router.push({ pathname: "/perfilEntregador" })
                 }
             >
                 <View>

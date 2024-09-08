@@ -102,27 +102,7 @@ export default function CorridasEmAndamento() {
         }
     }
 
-    // const corridas_mock: Corrida[] = [
-    //     {
-    //         id: '1',
-    //         entregador: 'José',
-    //         coleta: '21:32',
-    //         previsaoEntrega: '21:52',
-    //         atrasada: true,
-    //     },
-    //     {
-    //         id: '2',
-    //         entregador: 'Pedro',
-    //         coleta: '22:32',
-    //         previsaoEntrega: '23:02',
-    //         atrasada: false,
-    //     },
-    //     // Adicione mais corridas aqui
-    // ];
 
-    // const corridasFiltradas = corridas?.filter(corrida =>
-    //     filtro === 'Todas' || (filtro === 'Atrasadas' && isAtrasada(corrida?.create_at, corrida?.previsao_entrega))
-    // );
 
     const corridasFiltradas = corridas?.filter(corrida => {
         const isAtrasadaEntrega = isAtrasada(corrida?.created_at, corrida?.previsao_entrega);
@@ -169,7 +149,7 @@ export default function CorridasEmAndamento() {
                     <HeaderThreads user={user} />
 
                     <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
-                    {/* Filtros */}
+                    {/* Filtros
                     <View style={styles.filtros}>
 
                         <TouchableOpacity
@@ -182,6 +162,30 @@ export default function CorridasEmAndamento() {
                             onPress={() => setFiltro('Atrasadas')}>
                             <Text style={filtro === 'Atrasadas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Atrasadas</Text>
                         </TouchableOpacity>
+                    </View> */}
+
+                    {/* Filtros e botão de atualizar */}
+                    <View style={styles.filtrosContainer}>
+                        <View style={styles.filtros}>
+                            <TouchableOpacity
+                                style={[styles.filtroButton, filtro === 'Todas' && styles.filtroButtonAtivo]}
+                                onPress={() => setFiltro('Todas')}>
+                                <Text style={filtro === 'Todas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Todas</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.filtroButton, filtro === 'Atrasadas' && styles.filtroButtonAtivo]}
+                                onPress={() => setFiltro('Atrasadas')}>
+                                <Text style={filtro === 'Atrasadas' ? styles.filtroButtonAtivoText : styles.filtroButtonText}>Atrasadas</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Botão para atualizar corridas */}
+                        <TouchableOpacity
+                            style={styles.atualizarButton}
+                            onPress={getCorridas} // Chama a função para atualizar as corridas
+                        >
+                            <Text style={styles.atualizarButtonText}>Atualizar</Text>
+                        </TouchableOpacity>
                     </View>
 
                     {/* Lista de Corridas */}
@@ -191,7 +195,7 @@ export default function CorridasEmAndamento() {
                         keyExtractor={item => item.id}
                         contentContainerStyle={styles.listaCorridas}
                         ListEmptyComponent={
-                            <Text style={styles.emptyMessage}>Nenhuma entrega realizada ainda.</Text>
+                            <Text style={styles.emptyMessage}>Nenhuma entrega em andamento no momento.</Text>
                         }
                     />
                 </View>
@@ -335,5 +339,21 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontSize: 16,
         color: '#999',
+    },
+    filtrosContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+    },
+    atualizarButton: {
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        backgroundColor: '#28a745',
+        borderRadius: 5,
+    },
+    atualizarButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
