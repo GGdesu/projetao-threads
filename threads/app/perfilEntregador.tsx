@@ -17,19 +17,19 @@ const ShopkeeperProfileScreen: React.FC = () => {
 
   const router = useRouter();
 
-  const shopkeeper: Shopkeeper = {
-    id: '1',
-    name: 'Maria Souza',
-    email: 'maria.souza@lojista.com',
-    phone: '(11) 91234-5678',
-    storeName: 'Loja da Maria',
-    profilePicture: profilePicture,
-    cnpj: '12.345.678/0001-99',
-    address: 'Rua das Flores, 123, São Paulo, SP',
-    bankAccount: 'Banco XYZ - Ag: 1234 - C/C: 56789-0',
-    deliveries: 120,
-    totalSpent: 'R$ 4.500,00',
-  };
+  // const shopkeeper: Shopkeeper = {
+  //   id: '1',
+  //   name: 'Maria Souza',
+  //   email: 'maria.souza@lojista.com',
+  //   phone: '(11) 91234-5678',
+  //   storeName: 'Loja da Maria',
+  //   profilePicture: profilePicture,
+  //   cnpj: '12.345.678/0001-99',
+  //   address: 'Rua das Flores, 123, São Paulo, SP',
+  //   bankAccount: 'Banco XYZ - Ag: 1234 - C/C: 56789-0',
+  //   deliveries: 120,
+  //   totalSpent: 'R$ 4.500,00',
+  // };
 
   const handleEditProfile = () => {
     // Navega para a tela de edição do perfil
@@ -82,7 +82,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image source={shopkeeper.profilePicture} style={styles.profilePicture} />
+        <Image source={profilePicture} style={styles.profilePicture} />
         <Text style={styles.name}>{user?.nome}</Text>
         {/* <Text style={styles.storeName}>{shopkeeper.storeName}</Text> */}
       </View>
