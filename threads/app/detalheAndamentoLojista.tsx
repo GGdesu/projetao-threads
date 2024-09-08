@@ -1,8 +1,33 @@
+import { useUser } from '@/context/userContext';
+import { formatarDataHoraISO } from '@/utils/misc';
+import { getDelivers, updateDeliverSituation } from '@/utils/supabaseUtils';
 import { FontAwesome } from '@expo/vector-icons';
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { Button } from '@rneui/base';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
 
 export default function DetalhesDaCorrida() {
+
+    const { corridas, setCorridas } = useUser(); // A lista de corridas vinda do contexto
+    const { corridaID, atrasada } = useLocalSearchParams(); // Pegando o ID da corrida da URL
+    const { user } = useUser();
+    const router = useRouter();
+
+    const [disable, setDisable] = useState(false);
+
+    // Encontrando a corrida específica com base no id
+    const corrida = corridas?.find(corrida => corrida.id === corridaID);
+
+    // Caso não tenha encontrado a corrida
+    if (!corrida) {
+        return (
+            <View>
+                <Text>Corrida não encontrada {corridaID}</Text>
+            </View>
+        );
+    }
+
 
     const renderStars = (rating: number) => {
         const stars = [];
@@ -19,6 +44,74 @@ export default function DetalhesDaCorrida() {
         return stars;
     };
 
+
+    async function handleCancelarCorrida() {
+        try {
+            await updateDeliverSituation(corrida?.id, "cancelada")
+            Alert.alert("Corrida Cancelada")
+            getCorridas()
+            router.navigate("/(tabs)/")
+
+        } catch (error) {
+            console.log("Foi Capturado um erro: ", error)
+
+        }
+    }
+    
+    //console.log(index)
+
+    async function handleFinalizarCorrida() {
+        try {
+            await updateDeliverSituation(corrida?.id, "finalizada")
+            Alert.alert("Corrida Finalizada")
+            getCorridas()
+
+            router.navigate("/(tabs)/")
+            setDisable(true)
+
+        } catch (error) {
+            console.log("Foi Capturado um erro: ", error)
+
+        }
+
+    }
+
+    async function getCorridas() {
+        try {
+    
+            if (user?.tipo_usuario === 1) {
+                const userCorrida = await getDelivers("lojista_id", user?.lojista_id)
+    
+                if (!userCorrida) {
+                    console.log("erro ao tentar receber dados na variavel userCorrida: ", userCorrida)
+                    return null
+                }
+    
+                if (userCorrida) {
+                    setCorridas(userCorrida)
+                }
+    
+            } else if (user?.tipo_usuario === 2) {
+                const userCorrida = await getDelivers("entregador_id", user?.entregador_id)
+    
+                if (!userCorrida) {
+                    console.log("erro ao tentar receber dados na variavel userCorrida: ", userCorrida)
+                    return null
+                }
+    
+                if (userCorrida) {
+                    setCorridas(userCorrida)
+                }
+            }
+    
+            console.log("tentou pegar as corridas")
+    
+        } catch (error) {
+            console.log("erro na função getCorridas: ", error)
+            return null
+        }
+    }
+
     return (
         <View style={styles.container}>
             {/* Seção de Detalhes da Corrida */}
@@ -28,11 +121,11 @@ export default function DetalhesDaCorrida() {
 
             {/* Seção de Previsão */}
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={styles.subTitle}>Previsão: 23:02</Text>
+                <Text style={styles.subTitle}>Previsão: {corrida.previsao_entrega}</Text>
                 <View style={styles.headerRight}>
                     <Text style={styles.raceNumber}>Nº 1136</Text>
                     <TouchableOpacity style={styles.statusButton}>
-                        <Text style={styles.statusText}>Atrasada</Text>
+                        <Text style={styles.statusText}>{atrasada}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -45,12 +138,12 @@ export default function DetalhesDaCorrida() {
                     source={{ uri: 'https://via.placeholder.com/150' }} // Substitua pela URL da imagem real
                 />
                 <View style={styles.delivererInfo}>
-                    <Text>Entregador: <Text style={styles.delivererName}>Pedro</Text></Text>
-                    <TouchableOpacity onPress={() => Linking.openURL(`tel:${'(81) 99999-9999'}`)}>
-                        <Text>Telefone: <Text style={styles.delivererPhone}>(81) 99999-9999</Text></Text>
+                    <Text>{user?.tipo_usuario === 1 ? "Entregador: " : "Restaurante"}<Text style={styles.delivererName}></Text>{user?.tipo_usuario === 1 ? corrida.nome_entregador : user?.nome_loja}</Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(`tel:${user?.telefone}`)}>
+                        <Text>Telefone: <Text style={styles.delivererPhone}>{user?.telefone}</Text></Text>
                     </TouchableOpacity>
 
-                    <Text>{renderStars(5)}</Text>{/* Substitua por um componente de avaliação real */}
+                    <Text>{user?.tipo_usuario === 2 ? renderStars(5) : ""}</Text>{/* Substitua por um componente de avaliação real */}
                 </View>
             </View>
 
@@ -59,10 +152,54 @@ export default function DetalhesDaCorrida() {
 
             {/* Seção de Informações da Corrida */}
             <View style={styles.infoContainer}>
-                <Text><Text style={styles.boldText}>Preço da corrida:</Text> R$5,00</Text>
-                <Text><Text style={styles.boldText}>Solicitada:</Text> 22:02</Text>
-                <Text><Text style={styles.boldText}>Coleta:</Text> 22:32</Text>
-                <Text><Text style={styles.boldText}>Endereço:</Text> Rua Lorem ipsum dolor sit amet, 03</Text>
+                <Text><Text style={styles.boldText}>Preço da corrida: R$</Text>{corrida.preco}</Text>
+                <Text><Text style={styles.boldText}>Solicitada:</Text> {formatarDataHoraISO(corrida.created_at)}</Text>
+                <Text><Text style={styles.boldText}>Coleta:</Text> {corrida.coleta}</Text>
+                <Text><Text style={styles.boldText}>Endereço de Entrega:</Text> {corrida.endereco_entrega}</Text>
+            </View>
+
+            <View style={{ alignItems: 'center' }}>
+                <Button
+                    title="Finalizar Corrida"
+                    onPress={handleFinalizarCorrida}
+                    disabled={disable}
+                    buttonStyle={{
+                        backgroundColor: 'rgba(127, 220, 103, 1)',
+                        borderRadius: 10
+                    }}
+                    containerStyle={{
+                        height: 40,
+                        width: '90%',
+                        marginHorizontal: 10,
+                        //marginVertical: 0,
+
+
+                    }}
+                    titleStyle={{
+                        color: 'white',
+                        marginHorizontal: 20,
+                    }}
+                />
+                <Button
+                    title="Cancelar Corrida"
+                    onPress={handleCancelarCorrida}
+                    disabled={disable}
+                    buttonStyle={{
+                        backgroundColor: 'rgba(127, 220, 103, 1)',
+                        borderRadius: 10
+                    }}
+
+                    containerStyle={{
+                        height: 40,
+                        width: '90%',
+                        marginHorizontal: 10,
+                        marginVertical: 20,
+                    }}
+                    titleStyle={{
+                        color: 'white',
+                        marginHorizontal: 20,
+                    }}
+                />
             </View>
 
             {/* Botões Aceitar e Recusar */}
@@ -77,6 +214,10 @@ export default function DetalhesDaCorrida() {
         </View>
     );
 }
+
+
+
+
 
 const styles = StyleSheet.create({
     container: {

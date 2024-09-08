@@ -34,13 +34,13 @@ export default function TabLayout() {
             },
             headerShown: false,
         }}>
-            <Tabs.Screen
+            {/* <Tabs.Screen
                 name="andamento"
                 options={{
                     title: "Home",
                     href: null
                 }}
-            />
+            /> */}
             
             {/* condicional que mostra a tab bar para o lojista, caso o usuario seja o lojista */}
             {user?.tipo_usuario === 1 ? (

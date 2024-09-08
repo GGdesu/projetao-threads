@@ -4,21 +4,8 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } fr
 import { Button } from '@rneui/themed';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'expo-router';
-import { formatCnpj } from '@/utils/mask';
 
-interface Shopkeeper {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  storeName: string;
-  profilePicture: any;
-  cnpj: string;
-  address: string;
-  bankAccount: string;
-  deliveries: number;
-  totalSpent: string;
-}
+
 
 // Importando a imagem de perfil localmente com caminho relativo
 const profilePicture = require('@/assets/images/shopkeeper.jpg');
@@ -30,19 +17,19 @@ const ShopkeeperProfileScreen: React.FC = () => {
 
   const router = useRouter();
 
-  const shopkeeper: Shopkeeper = {
-    id: '1',
-    name: 'Maria Souza',
-    email: 'maria.souza@lojista.com',
-    phone: '(11) 91234-5678',
-    storeName: 'Loja da Maria',
-    profilePicture: profilePicture,
-    cnpj: '12.345.678/0001-99',
-    address: 'Rua das Flores, 123, São Paulo, SP',
-    bankAccount: 'Banco XYZ - Ag: 1234 - C/C: 56789-0',
-    deliveries: 120,
-    totalSpent: 'R$ 4.500,00',
-  };
+  // const shopkeeper: Shopkeeper = {
+  //   id: '1',
+  //   name: 'Maria Souza',
+  //   email: 'maria.souza@lojista.com',
+  //   phone: '(11) 91234-5678',
+  //   storeName: 'Loja da Maria',
+  //   profilePicture: profilePicture,
+  //   cnpj: '12.345.678/0001-99',
+  //   address: 'Rua das Flores, 123, São Paulo, SP',
+  //   bankAccount: 'Banco XYZ - Ag: 1234 - C/C: 56789-0',
+  //   deliveries: 120,
+  //   totalSpent: 'R$ 4.500,00',
+  // };
 
   const handleEditProfile = () => {
     // Navega para a tela de edição do perfil
@@ -95,8 +82,8 @@ const ShopkeeperProfileScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image source={shopkeeper.profilePicture} style={styles.profilePicture} />
-        <Text style={styles.name}>{user?.nome_loja}</Text>
+        <Image source={profilePicture} style={styles.profilePicture} />
+        <Text style={styles.name}>{user?.nome}</Text>
         {/* <Text style={styles.storeName}>{shopkeeper.storeName}</Text> */}
       </View>
 
@@ -111,9 +98,9 @@ const ShopkeeperProfileScreen: React.FC = () => {
       <View style={styles.divider} />
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Dados da Empresa</Text>
-        <Text style={styles.label}>CNPJ</Text>
-        <Text style={styles.details}>{formatCnpj(user?.cnpj.toString())}</Text>
+        <Text style={styles.sectionTitle}>Outros Dados</Text>
+        <Text style={styles.label}>CNH</Text>
+        <Text style={styles.details}>{user?.cnh}</Text>
         <Text style={styles.label}>Endereço</Text>
         <Text style={styles.details}>{user?.endereco}</Text>
         <Text style={styles.label}>Conta Bancária</Text>

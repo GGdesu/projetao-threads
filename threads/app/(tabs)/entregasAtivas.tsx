@@ -188,13 +188,13 @@ export default function TelaInicial() {
             style={[styles.card, item.atrasada && styles.cardAtrasada]}
             onPress={() => router.push({
                 pathname: "/detalheAndamentoLojista",
-                params: { corridaId: item.id }
+                params: { corridaID: item.id }
             })}>
             <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />
             <View style={styles.cardInfo}>
                 <Text style={styles.entregadorNome}>Loja: <Text style={styles.boldText}>{item.nome_lojista}</Text></Text>
                 <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
-                <Text style={styles.cardText}>Previsão de entrega: {item.previsaoEntrega}</Text>
+                <Text style={styles.cardText}>Previsão de entrega: {item.previsao_entrega}</Text>
                 <Text style={styles.cardText}>Preço: {item.preco}</Text>
             </View>
             <View style={styles.buttonsContainer}>

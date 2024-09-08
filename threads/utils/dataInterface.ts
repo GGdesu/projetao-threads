@@ -1,5 +1,7 @@
+
 export interface Corrida {
     id: string;
+    created_at: string;
     entregador_id: string | null;
     lojista_id: string | null;
     nome_lojista: string | null;
@@ -7,14 +9,12 @@ export interface Corrida {
     telefone_lojista: number | null;
     telefone_entregador: number | null;
     tempo_preparo: number | null;
-    tempo_max_entrega: number | null;
+    previsao_entrega: string | null;
     endereco_entrega: string | null;
     situacao_corrida: string | null;
     preco: number | null;
     avaliacao: number | null;
-    coleta: string;
-    previsaoEntrega: string;
-    atrasada: boolean;
+    coleta: string | null;
 }
 
 export interface UserData {

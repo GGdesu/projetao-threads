@@ -1,4 +1,4 @@
-import { UserData } from "./dataInterface";
+import { Corrida, UserData } from "./dataInterface";
 
 import { supabase } from "./supabase"
 
@@ -105,7 +105,7 @@ export async function updateActiveUser(data: { [key: string]: any }, tipo_conta_
 }
 
 //vai pegar todas as infos de corridas relacionada ao usuario
-export async function getDelivers(nome_coluna: string, id_usuario: string) {
+export async function getDelivers(nome_coluna: string, id_usuario: string | null) {
     try {
         const { data: entregas, error } = await supabase
             .from("entrega")
@@ -115,7 +115,7 @@ export async function getDelivers(nome_coluna: string, id_usuario: string) {
         if (error) {
             console.log("não foi possivel obter as entregas: ", error)
         } else {
-            console.log("entregas obtidas com sucesso")
+            console.log("entregas obtidas com sucesso: ", entregas)
             return entregas
         }
 
@@ -142,6 +142,31 @@ export async function getActiveDelivers() {
     } catch (error) {
         console.log("foi encontrado um erro ao executar codigo: ", error)
     }
+}
+
+export async function updateDeliverSituation(id: string | undefined, situacao_corrida: string) {
+    try {
+
+        if(id === undefined){
+            console.log("ID indefinido")
+            return null
+        }
+        const { error } = await supabase
+        .from('entrega')
+        .update({"situacao_corrida": situacao_corrida})
+        .eq("id", id)
+
+        if(error){
+            console.log("Ocorreu um erro ao atualizar a situação da corrida: ", error.message)
+        }else{
+            console.log("Situação atualizada com sucesso")
+        }
+        
+    } catch (error) {
+        console.log("erro capturado: ", error)
+        
+    }
+    
 }
 
 export async function updateActiveDelivers() {
