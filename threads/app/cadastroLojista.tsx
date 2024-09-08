@@ -3,6 +3,7 @@ import { Button, Input } from "@rneui/base";
 import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/utils/supabase";
+import { formatCnpj } from "@/utils/mask";
 
 export default function cadastroScreen() {
     const [value, setValue] = useState("");
@@ -119,7 +120,8 @@ export default function cadastroScreen() {
                     label="CNPJ"
                     labelStyle={styles.labelForm}
                     onChangeText={handleCnpjChange}
-                    value={cnpj}
+                    maxLength={18}
+                    value={formatCnpj(cnpj)}
                 />
                 <Input
                     placeholder="Informe seu Endereço"
