@@ -103,8 +103,7 @@ export default function DetalhesDaCorrida() {
                     setCorridas(userCorrida)
                 }
             }
-    
-            console.log("tentou pegar as corridas")
+            
     
         } catch (error) {
             console.log("erro na função getCorridas: ", error)

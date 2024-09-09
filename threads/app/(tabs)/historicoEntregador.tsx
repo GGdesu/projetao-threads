@@ -8,9 +8,11 @@ import { useUser } from "@/context/userContext";
 
 interface Entrega {
   id: string;
-  restaurante: string;
-  valor: string;
-  atraso: number;
+  nome_entregador: string;
+  nome_lojista: string; 
+  preco: number; 
+  endereco_entrega: string; 
+  atraso: number | null;   
 }
 
 export default function historicoScreen() {
@@ -60,7 +62,7 @@ export default function historicoScreen() {
     
             // Calcular faturamento, verificando se `valor` é válido
             const totalFaturamento = data.reduce((acc, entrega) => {
-              const valor = parseFloat(entrega.valor);
+              const valor = parseFloat(entrega.preco);
               return acc + (isNaN(valor) ? 0 : valor);
             }, 0);
             setFaturamento(totalFaturamento);
@@ -82,41 +84,6 @@ export default function historicoScreen() {
       fetchEntregas();
     }, []);
 
-    useEffect(() => {
-      const fetchEntregadorNome = async () => {
-        try {
-          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  
-          if (sessionError) {
-            throw sessionError;
-          }
-  
-          const userId = sessionData.session?.user.id;
-  
-          if (!userId) {
-            console.error('Usuário não está logado');
-            return;
-          }
-  
-          const { data, error } = await supabase
-            .from('usuario') // Tabela onde estão os dados do entregador
-            .select('nome') // Coluna que você deseja selecionar
-            .eq('id', userId)
-            .single();
-  
-          if (error) {
-            throw error;
-          }
-  
-          setEntregadorNome(data?.nome || 'Nome não disponível');
-        } catch (error) {
-          console.error('Erro ao buscar informações do entregador:', error);
-        }
-      };
-  
-      fetchEntregadorNome();
-    }, []);
-
     const handlePressItem = (entrega: Entrega) => {
       setSelectedEntrega(entrega);
       setModalVisible(true);
@@ -132,8 +99,8 @@ export default function historicoScreen() {
           style={styles.ultimaEntrega}
           onPress={() => handlePressItem(item)}
         >
-          <Text style={styles.textBold}>Restaurante: {item.restaurante}</Text>
-          <Text style={styles.textBold}>Valor da entrega: {item.valor}</Text>
+          <Text style={styles.textBold}>Restaurante: {item.nome_lojista}</Text>
+          <Text style={styles.textBold}>Valor da entrega: {item.preco}</Text>
           <Text style={styles.textBold}>Atraso: {item.atraso} minutos</Text>
           <Text style={styles.textBold}>Clique para mais detalhes</Text>    
       </TouchableOpacity>
@@ -179,8 +146,8 @@ export default function historicoScreen() {
               <View style={styles.modalBackdrop}>
                 <View style={styles.modalContent}>
                   <Text style={styles.modalHeader}>Detalhes da Entrega</Text>
-                  <Text>Restaurante: {selectedEntrega.restaurante}</Text>
-                  <Text>Valor da entrega: {selectedEntrega.valor}</Text>
+                  <Text>Restaurante: {selectedEntrega.nome_lojista}</Text>
+                  <Text>Valor da entrega: {selectedEntrega.preco}</Text>
                   <Text>Atraso: {selectedEntrega.atraso} minutos</Text>
                   <Button title="Fechar" onPress={closeModal} />
                 </View>
@@ -281,7 +248,7 @@ export default function historicoScreen() {
         padding: 20, 
         backgroundColor: '#fff', 
         borderRadius: 10, 
-        alignItems: 'center', 
+        alignItems: 'flex-start', 
         shadowColor: '#000', 
         shadowOffset: {
           width: 0,

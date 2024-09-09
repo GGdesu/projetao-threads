@@ -12,8 +12,7 @@ export async function getActiveUser() {
             return null;
         }
 
-        if (user) {
-            console.log("Usuário ativo resgatado com sucesso:", user.id);
+        if (user) {            
             return user.id;
         } else {
             console.log("Nenhum usuário logado.");
@@ -52,8 +51,7 @@ export async function getActiveUserData() {
                     return null
                 }
 
-                if (user) {
-                    console.log("informações do usuário resgatadas com sucesso: ", user[0])
+                if (user) {                    
                     return user[0]
                 } else {
                     console.log("nenhum usuario logado")
@@ -64,8 +62,7 @@ export async function getActiveUserData() {
                 console.log("Erro ao tentar resgatar o entregador:", error)
             }
         }
-        if (user) {
-            console.log("informações do usuário resgatadas com sucesso: ", user[0])
+        if (user) {            
             return user[0]
         } else {
             console.log("nenhum usuario logado")
