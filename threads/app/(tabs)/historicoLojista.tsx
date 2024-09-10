@@ -8,10 +8,12 @@ import { useUser } from "@/context/userContext";
 
 interface Entrega {
   id: string;
-  entregador: string;
-  valor: string;
-  endereco: string;
-  avaliacao: number;
+  nome_entregador: string; 
+  preco: number; 
+  rua: string;
+  numero: number;
+  bairro: string;
+  cidade: string;   
 }
 
 export default function historicoScreen() {
@@ -31,96 +33,62 @@ export default function historicoScreen() {
   const { user } = useUser();
 
 
-    useEffect(() => {      
-      const fetchEntregas = async () => {
-        try {
-          // Obtendo o usuário logado
-          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  
-          if (sessionError) {
-            throw sessionError;
-          }
-  
-          const userId = sessionData.session?.user.id; // Obtendo o ID do usuário logado
-  
-          if (!userId) {
-            console.error('Usuário não está logado');
-            return;
-          }
-  
-          // Buscando entregas do usuário logado
-          const { data, error } = await supabase
-            .from('entrega') // Nome da tabela
-            .select('*')
-            .eq('lojista_id', userId)
-            .eq('situacao_corrida', 'finalizada');
-  
-          if (error) {
-            throw error;
-          }
-          setEntregas(data as Entrega[]);
-        } catch (error) {
-          console.error('Erro ao buscar entregas:', error);
-        }
-
-
-    };
-
-    fetchEntregas();
-  }, []);
-
   useEffect(() => {
-    const fetchHistorico = async () => {
+    const fetchEntregasHistorico = async () => {
       try {
-        // Obtendo o usuário logado
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-
+  
         if (sessionError) {
           throw sessionError;
         }
-
-        const userId = sessionData.session?.user.id; // Obtendo o ID do usuário logado
-
+  
+        const userId = sessionData.session?.user.id;
+  
         if (!userId) {
           console.error('Usuário não está logado');
           return;
         }
-
-        // Consultas ao banco de dados
-        const { data: entregas, error: fetchError } = await supabase
-          .from('entrega') // Nome da tabela
+  
+        // Consultando entregas do usuário logado
+        const { data, error } = await supabase
+          .from('entrega')
           .select('*')
-          .eq('lojista_id', userId);
-
-        if (fetchError) {
-          throw fetchError;
+          .eq('lojista_id', userId)
+          .eq('situacao_corrida', 'finalizada');
+  
+        if (error) {
+          throw error;
         }
-
-        if (entregas) {
+  
+        if (data) {
+          setEntregas(data as Entrega[]);          
+  
           // Calcular gastos totais
-          const totalGastos = entregas.reduce((acc, entrega) => acc + parseFloat(entrega.valor), 0);
+          const totalGastos = data.reduce((acc, entrega) => acc + (entrega.preco ? parseFloat(entrega.preco) : 0), 0);
           setGastosTotais(totalGastos);
-
+  
           // Calcular o tempo médio de atraso
-          const totalAtraso = entregas.reduce((acc, entrega) => acc + entrega.tempo_atraso, 0);
-          const avgAtraso = entregas.length > 0 ? totalAtraso / entregas.length : 0;
+          const totalAtraso = data.reduce((acc, entrega) => acc + (entrega.tempo_atraso ? entrega.tempo_atraso : 0), 0);
+          const avgAtraso = data.length > 0 ? totalAtraso / data.length : 0;
           setTempoMedioAtraso(avgAtraso);
-
+  
           // Corridas totais
-          setCorridasTotais(entregas.length);
-
+          setCorridasTotais(data.length);
+  
           // Tempo médio de entrega
-          const totalEntrega = entregas.reduce((acc, entrega) => acc + entrega.tempo_entrega, 0);
-          const avgEntrega = entregas.length > 0 ? totalEntrega / entregas.length : 0;
+          const totalEntrega = data.reduce((acc, entrega) => acc + (entrega.tempo_entrega ? entrega.tempo_entrega : 0), 0);
+          const avgEntrega = data.length > 0 ? totalEntrega / data.length : 0;
           setTempoMedioEntrega(avgEntrega);
+          
         }
       } catch (error) {
         console.error('Erro ao buscar histórico: ', error);
       }
     };
-
-    fetchHistorico();
+  
+    fetchEntregasHistorico();
   }, []);
+  
 
   useEffect(() => {
     if (!lojistaId) return;
@@ -155,17 +123,17 @@ export default function historicoScreen() {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedEntrega(null);
-  };
+  };  
 
   const renderItem: ListRenderItem<Entrega> = ({ item }) => (
     <TouchableOpacity
       style={styles.ultimaEntrega}
       onPress={() => handlePressItem(item)}
     >
-      <Text style={styles.textBold}>Entregador: {item.entregador}</Text>
-      <Text style={styles.textBold}>Valor da entrega: {item.valor}</Text>
-      <Text style={styles.textBold}>Endereço da entrega: {item.endereco}</Text>
-      <Text style={styles.textBold}>Avaliação da entrega: {item.avaliacao}</Text>
+      <Text style={styles.textBold}>Entregador: {item.nome_entregador || 'Não disponível'}</Text>
+      <Text style={styles.textBold}>Valor da entrega: R${item.preco ? item.preco.toFixed(2) : '0,00'}</Text>
+      <Text style={styles.textBold}>Endereço da entrega: {`${item.rua}, ${item.numero}, ${item.bairro}, ${item.cidade}` || 'Endereço não disponível'}</Text>
+      {/* <Text style={styles.textBold}>Avaliação da entrega: {item.avaliacao || 'Sem avaliação'}</Text> */}
       <Text style={styles.textBold}>Clique para mais detalhes</Text>
     </TouchableOpacity>
   );
@@ -182,32 +150,32 @@ export default function historicoScreen() {
             <Text style={{ fontWeight: 'bold' }}>Gastos Totais</Text>
             <Text>R${gastosTotais?.toFixed(2) || '0,00'}</Text>
           </View>
-          <View style={styles.infoBox}>
+          {/* <View style={styles.infoBox}>
             <Text style={{ fontWeight: 'bold' }}>Tempo médio de atraso</Text>
             <Text>{tempoMedioAtraso !== null ? `${Math.round(tempoMedioAtraso)} minutos` : '0 minutos'}</Text>
-          </View>
+          </View> */}
           <View style={styles.infoBox}>
             <Text style={{ fontWeight: 'bold' }}>Corridas Totais</Text>
             <Text>{corridasTotais || 0}</Text>
           </View>
-          <View style={styles.infoBox}>
+          {/* <View style={styles.infoBox}>
             <Text style={{ fontWeight: 'bold' }}>Tempo médio de entrega</Text>
             <Text>{tempoMedioEntrega !== null ? `${Math.round(tempoMedioEntrega)} minutos` : '0 minutos'}</Text>
-          </View>
+          </View> */}
         </View>
       </View>
       <View style={styles.linha} />
       <Text style={styles.title}>Ultimas Entregas</Text>
       <View style={styles.container}>
-        <FlatList
-          data={entregas}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={
-            <Text style={styles.emptyMessage}>Nenhuma entrega realizada ainda.</Text>
-          }
-          contentContainerStyle={entregas.length === 0 ? { flexGrow: 1 } : undefined}
-        />
+      <FlatList
+        data={entregas}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id} // Verifique se o campo id é o correto
+        ListEmptyComponent={
+          <Text style={styles.emptyMessage}>Nenhuma entrega realizada ainda.</Text>
+        }
+        contentContainerStyle={entregas.length === 0 ? { flexGrow: 1 } : undefined}
+      />
 
         {/* Modal para exibir os detalhes da entrega */}
         {selectedEntrega && (
@@ -220,10 +188,10 @@ export default function historicoScreen() {
             <View style={styles.modalBackdrop}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalHeader}>Detalhes da Entrega</Text>
-                <Text>Entregador: {selectedEntrega.entregador}</Text>
-                <Text>Valor da entrega: {selectedEntrega.valor}</Text>
-                <Text>Endereço da entrega: {selectedEntrega.endereco}</Text>
-                <Text>Avaliação da entrega: {selectedEntrega.avaliacao}</Text>
+                <Text>Entregador: {selectedEntrega.nome_entregador}</Text>
+                <Text>Valor da entrega: {selectedEntrega.preco}</Text>
+                <Text>Endereço da entrega: {`${selectedEntrega.rua}, ${selectedEntrega.numero}, ${selectedEntrega.bairro}, ${selectedEntrega.cidade}`}</Text>
+                {/* <Text>Avaliação da entrega: {selectedEntrega.avaliacao}</Text> */}
                 <Button title="Fechar" onPress={closeModal} />
               </View>
             </View>
@@ -327,7 +295,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   modalHeader: {
     fontSize: 20,
