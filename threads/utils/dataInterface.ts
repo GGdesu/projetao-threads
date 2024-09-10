@@ -15,6 +15,10 @@ export interface Corrida {
     preco: number | null;
     avaliacao: number | null;
     coleta: string | null;
+    rua: string | null;
+    numero: number | null;
+    bairro: string | null;
+    cidade: string | null;
 }
 
 export interface UserData {
@@ -33,6 +37,10 @@ export interface UserData {
     telefone: number;
     tipo_usuario: number;
     veiculo: string | null;
+    rua: string | null;
+    numero: number | null;
+    bairro: string | null;
+    cidade: string | null;
 }
 
 export interface UserContextProps{

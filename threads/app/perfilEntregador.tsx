@@ -8,7 +8,7 @@ import { useRouter } from 'expo-router';
 
 
 // Importando a imagem de perfil localmente com caminho relativo
-const profilePicture = require('@/assets/images/shopkeeper.jpg');
+const profilePicture = require('@/assets/iconPng/motorcycle.png');
 
 const ShopkeeperProfileScreen: React.FC = () => {
 
@@ -100,7 +100,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
         <Text style={styles.label}>CNH</Text>
         <Text style={styles.details}>{user?.cnh}</Text>
         <Text style={styles.label}>Endereço</Text>
-        <Text style={styles.details}>{user?.endereco}</Text>
+        <Text style={styles.details}>{`${user?.rua}, ${user?.numero}, ${user?.bairro}, ${user?.cidade}`}</Text>
         <Text style={styles.label}>Veiculo</Text>
         <Text style={styles.details}>{user?.veiculo}</Text>
         <Text style={styles.label}>Conta Bancária</Text>
@@ -175,9 +175,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   profilePicture: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 90,
+    height: 90,
+    borderRadius: 5,
   },
   name: {
     fontSize: 20,

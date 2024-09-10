@@ -18,6 +18,10 @@ export default function PerfilLogistaScreen() {
     const [endereco, setEndereco] = useState(user?.endereco || "")
     const [telefone, setTelefone] = useState("")
     const [contaBancaria, setContaBancaria] = useState("");
+    const [rua, setRua] = useState("");
+    const [numero, setNumero] = useState("");
+    const [bairro, setBairro] = useState("");
+    const [cidade, setCidade] = useState("");
 
     const handleNomeLojaChange = (text: string) => {
         setNomeLoja(text);
@@ -56,6 +60,10 @@ export default function PerfilLogistaScreen() {
                         endereco: endereco,
                         telefone: parseInt(telefone) || user?.telefone,
                         conta_bancaria: parseInt(contaBancaria) || user?.conta_bancaria,
+                        rua: rua || user?.rua,
+                        numero: numero || user?.numero,
+                        bairro: bairro || user?.bairro,
+                        cidade: cidade || user?.cidade,
                     }
                 ])
                 .eq("lojista_id", user?.lojista_id)
@@ -122,13 +130,50 @@ export default function PerfilLogistaScreen() {
 
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Endereço</Text>
-                    <Input
-                        placeholder={user?.endereco}
-                        inputStyle={styles.inputLabel}
-                        containerStyle={styles.inputContainerStyle} // Aplicando o contorno
-                        onChangeText={handleEnderecoChange}
-                        value={endereco}
-                    />
+                    <View style={styles.containerHorizontal}>
+                        <Input
+                            placeholder="Informe o nome da rua"
+                            inputStyle={(styles.inputTexto, { width: "40%" })}
+                            containerStyle={
+                                (styles.inputContainer, { width: "50%" })
+                            }
+                            value={rua}
+                            onChangeText={setRua}
+                            label="Nome da rua"
+                        />
+                        <Input
+                            placeholder="Informe o numero da casa"
+                            inputStyle={(styles.inputTexto, { width: "40%" })}
+                            containerStyle={
+                                (styles.inputContainer, { width: "50%" })
+                            }
+                            label="Numero"
+                            value={numero}
+                            onChangeText={setNumero}
+                        />
+                    </View>
+                    <View style={styles.containerHorizontal}>
+                        <Input
+                            placeholder="Informe o nome do bairro"
+                            inputStyle={(styles.inputTexto, { width: "40%" })}
+                            containerStyle={
+                                (styles.inputContainer, { width: "50%" })
+                            }
+                            label="Bairro"
+                            value={bairro}
+                            onChangeText={setBairro}
+                        />
+                        <Input
+                            placeholder="Informe o nome da cidade"
+                            inputStyle={styles.inputTexto}
+                            containerStyle={
+                                (styles.inputContainer, { width: "50%" })
+                            }
+                            label="Cidade"
+                            value={cidade}
+                            onChangeText={setCidade}
+                        />
+                    </View>
                 </View>
 
                 <View style={styles.inputPading}>
@@ -210,5 +255,22 @@ const styles = StyleSheet.create({
     },
     buttonWrapper: {
         width: "90%", // Define a largura do contêiner do botão como 80% da tela
+    },
+    inputTexto: {
+        color: "808080",
+        fontSize: 16,
+    },
+    inputContainer: {
+        marginTop: 20,
+        width: "100%",
+    },
+    containerHorizontal: {
+        flexDirection: "row",
+        //alignItems: "center",
+        width: "100%",
+        //backgroundColor: "#e6e6e6",
+        paddingVertical: 10,
+        //paddingHorizontal: 10,
+        borderRadius: 0,
     },
 });
