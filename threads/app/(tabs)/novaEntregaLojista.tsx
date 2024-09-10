@@ -1,104 +1,269 @@
 import { ScrollView, Text, View, StyleSheet, Image } from "react-native";
-import { Button, Input } from "@rneui/base";
+import { Button, color, Input } from "@rneui/base";
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { useUser } from "@/context/userContext";
+import { ScreenContainer } from "react-native-screens";
 import { supabase } from "@/utils/supabase";
+import { useUser } from "@/context/userContext";
 import { Alert } from "react-native";
 import HeaderThreads from "@/components/Header";
 
-export default function logistaScreen() {
-    const [value, setValue] = useState("");
-    const router = useRouter();
+interface Coordinates {
+    lat: number;
+    lon: number;
+}
 
-    //infos do usuario pegas atraves do context
-    const { user } = useUser();
+const getCoordinates = async (address: string): Promise<Coordinates> => {
+    const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${address}`
+    );
+    const data = await response.json();
+    return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+};
 
-    //inputs do usuario
-    const [tempoPreparo, setTempoPreparo] = useState("")
-    const [tempoMax, setTempoMax] = useState("")
-    const [endereco, setEndereco] = useState("")
+const calculateDistance = (
+    coord1: Coordinates,
+    coord2: Coordinates
+): number => {
+    const R = 6371; // Raio da Terra em km
+    const dLat = (coord2.lat - coord1.lat) * (Math.PI / 180);
+    const dLon = (coord2.lon - coord1.lon) * (Math.PI / 180);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(coord1.lat * (Math.PI / 180)) *
+            Math.cos(coord2.lat * (Math.PI / 180)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distância em km
+};
 
-    const preco = 5
+const calcularTempoDeEntrega = (
+    distancia: number,
+    tempoDePreparo: string,
+    velocidadeMedia: number = 30
+): number => {
+    let tempoDePreparoNum: number = 0;
 
-    const handleEnderecoChange = (text: string) => {
-        setEndereco(text);
-    };
-
-    const handleTempoPreparoChange = (text: string) => {
-        const numericValue = text.replace(/[^0-9]/g, '');
-        setTempoPreparo(numericValue);
-    };
-
-    const handleTempoMaxChange = (text: string) => {
-        const numericValue = text.replace(/[^0-9]/g, '');
-        setTempoMax(numericValue);
-    };
-    
-    async function criarEntrega() {
-        
-        try {
-            
-            const { error: upsertError } = await supabase
-            .from("entrega")
-            .upsert({
-                lojista_id: user?.lojista_id,
-                nome_lojista: user?.nome_loja,
-                telefone_lojista: user?.telefone,
-                tempo_preparo: tempoPreparo,
-                previsao_entrega: "20:25",
-                endereco_entrega: endereco,
-                situacao_corrida: "ativa",
-                preco: preco,
-
-
-            })
-
-            if (upsertError) {
-                Alert.alert('Erro ao salvar informações adicionais:', upsertError.message)
-            }else{
-                //console.log("entrega criada com sucesso")
-                Alert.alert("entrega criada com sucesso")
-                //router.push({pathname:""})
-            }
-
-        } catch (error) {
-            
-        }
-
+    if (tempoDePreparo !== null) {
+        tempoDePreparoNum = parseFloat(tempoDePreparo);
     }
 
+    const tempoEntregaHoras = distancia / velocidadeMedia;
+    const tempoEntregaMinutos = tempoEntregaHoras * 60;
+
+    return tempoDePreparoNum + tempoEntregaMinutos;
+};
+
+const calcularHorarioEntrega = (tempoTotal: number): string => {
+    const agora = new Date();
+
+    agora.setMinutes(agora.getMinutes() + tempoTotal);
+    const horas = agora.getHours().toString().padStart(2, "0");
+    const minutos = agora.getMinutes().toString().padStart(2, "0");
+
+    return `${horas}:${minutos}`;
+};
+
+export default function logistaScreen() {
+    //infos do usuario pegas atraves do context
+    const [errorMesage, setErrorMesage] = useState("");
+    const { user } = useUser();
+    const [coleta, setColeta] = useState("");
+    const [distance, setDistance] = useState<number | null>(null);
+    const [tempoDePreparo, setTempoDePreparo] = useState("0");
+    const [rua, setRua] = useState("");
+    const [numero, setNumero] = useState("");
+    const [bairro, setBairro] = useState("");
+    const [cidade, setCidade] = useState("");
+
+    const router = useRouter();
+
+    function calcularValorDaEntrega(): number {
+        const valorPorKm = 2; // R$ 2,00 por quilômetro
+        return distance! * valorPorKm;
+    }
+
+    // Função para enviar os dados ao Supabase
+
+    async function enviarDadosParaSupabase() {
+        try {
+            const { error: upsertError } = await supabase
+                .from("entrega")
+                .upsert({
+                    rua,
+                    numero,
+                    bairro,
+                    cidade,
+                    coleta,
+                    lojista_id: user?.lojista_id,
+                    nome_lojista: user?.nome_loja,
+                    telefone_lojista: user?.telefone,
+                    tempo_preparo: tempoDePreparo,
+                    previsao_entrega: calcularHorarioEntrega(
+                        calcularTempoDeEntrega(distance!, tempoDePreparo)
+                    ),
+                    situacao_corrida: "ativa",
+                    preco: calcularValorDaEntrega(),
+                });
+
+            if (upsertError) {
+                Alert.alert(
+                    "Erro ao salvar informações adicionais:",
+                    upsertError.message
+                );
+            } else {
+                //console.log("entrega criada com sucesso")
+                Alert.alert("entrega criada com sucesso");
+                //router.push({pathname:""})
+            }
+        } catch (error) {}
+    }
+
+    // const enviarDadosParaSupabase = async () => {
+    //     try {
+    //         const { data, error } = await supabase
+    //             .from("corridas") // Nome da tabela
+    //             .insert([
+    //                 {
+    //                     rua,
+    //                     numero,
+    //                     bairro,
+    //                     cidade,
+    //                     coleta,
+    //                     distancia: distance,
+    //                     tempo_preparo: tempoDePreparo,
+    //                     horario_entrega: calcularHorarioEntrega(
+    //                         calcularTempoDeEntrega(distance!, tempoDePreparo)
+    //                     ),
+    //                 },
+    //             ]);
+
+    //         if (error) {
+    //             console.error("Erro ao enviar dados:", error);
+    //         } else {
+    //             console.log("Dados enviados com sucesso:", data);
+    //         }
+    //     } catch (err) {
+    //         console.error("Erro ao conectar ao Supabase:", err);
+    //     }
+    // };
+
+    const handleCalculateDistance = async () => {
+        try {
+            const coord1 = await getCoordinates(
+                "Avenida Conde da Boa Vista, 800, Boa Vista, Recife, PE"
+            );
+            const coord2 = await getCoordinates(
+                `${rua}, ${numero}, ${bairro}, ${cidade}`
+            );
+            const dist = calculateDistance(coord1, coord2);
+            setDistance(dist);
+
+            const agora = new Date();
+            const tempoColeta = agora.setMinutes(
+                agora.getMinutes() + parseInt(tempoDePreparo)
+            );
+            const horas = agora.getHours().toString().padStart(2, "0");
+            const minutos = agora.getMinutes().toString().padStart(2, "0");
+            setColeta(`${horas}:${minutos}`);
+
+            // Após calcular a distância, envia os dados para o Supabase
+            await enviarDadosParaSupabase();
+
+            setBairro("");
+            setCidade("");
+            setErrorMesage("");
+            setNumero("");
+            setRua("");
+        } catch (error) {
+            setErrorMesage(" ERRO AO FAZER A ENTREGA");
+        }
+    };
+
+    const handleNumeroChange = (text: string) => {
+        // Remove qualquer caractere que não seja número
+        const onlyNumbers = text.replace(/[^0-9]/g, "");
+        setNumero(onlyNumbers);
+    };
 
     return (
         <View style={styles.screenContainer}>
-            <HeaderThreads user={user} />
+            <View style={styles.container}>
+                <Image
+                    style={styles.img}
+                    source={require("../../assets/images/iconePerfil.png")}
+                />
+                <Text style={styles.perfilTexto}>
+                    Nome do restaurante {"\n"}Localização
+                </Text>
+            </View>
             <View style={styles.formContainer}>
                 <Text style={styles.tituloTexto}>Informações da corrida</Text>
                 <Input
-                    placeholder="Tempo de preparo do produto em minuto"
+                    placeholder="Tempo de preparo do produto"
                     containerStyle={styles.inputContainer}
                     label="Tempo de preparo"
-                    onChangeText={handleTempoPreparoChange}
-                    value={tempoPreparo}
-                //labelStyle={styles.inputTexto}
-                />                
-                <Input
-                    placeholder="Informe o endereço de entrega"
-                    inputStyle={(styles.inputTexto, { height: 90 })}
-                    containerStyle={styles.inputContainer}
-                    label="Endereço de entrega"
-                    onChangeText={handleEnderecoChange}
-                    value={endereco}
-                //labelStyle={styles.inputTexto}
+                    value={tempoDePreparo}
+                    onChangeText={setTempoDePreparo}
                 />
+                <View style={styles.containerHorizontal}>
+                    <Input
+                        placeholder="Informe o nome da rua"
+                        inputStyle={(styles.inputTexto, { width: "40%" })}
+                        containerStyle={
+                            (styles.inputContainer, { width: "50%" })
+                        }
+                        value={rua}
+                        onChangeText={setRua}
+                        label="Nome da rua"
+                    />
+                    <Input
+                        placeholder="Informe o número da casa"
+                        inputStyle={(styles.inputTexto, { width: "40%" })}
+                        containerStyle={
+                            (styles.inputContainer, { width: "50%" })
+                        }
+                        label="Número"
+                        value={numero}
+                        onChangeText={handleNumeroChange}
+                        keyboardType="numeric" // Define o teclado numérico
+                    />
+                </View>
+                <View style={styles.containerHorizontal}>
+                    <Input
+                        placeholder="Informe o nome do bairro"
+                        inputStyle={(styles.inputTexto, { width: "40%" })}
+                        containerStyle={
+                            (styles.inputContainer, { width: "50%" })
+                        }
+                        label="Bairro"
+                        value={bairro}
+                        onChangeText={setBairro}
+                    />
+                    <Input
+                        placeholder="Informe o nome da cidade"
+                        inputStyle={styles.inputTexto}
+                        containerStyle={
+                            (styles.inputContainer, { width: "50%" })
+                        }
+                        label="Cidade"
+                        value={cidade}
+                        onChangeText={setCidade}
+                    />
+                </View>
+
                 <View style={styles.buttonContainer}>
                     <View style={styles.buttonWrapper}>
                         <Button
                             title={"Solicitar corrida"}
                             buttonStyle={styles.smallButton}
-                            onPress={criarEntrega}
+                            onPress={handleCalculateDistance}
                         />
                     </View>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <Text style={{ color: "#ff0000" }}>{errorMesage}</Text>
                 </View>
             </View>
         </View>
@@ -106,6 +271,15 @@ export default function logistaScreen() {
 }
 
 const styles = StyleSheet.create({
+    containerHorizontal: {
+        flexDirection: "row",
+        //alignItems: "center",
+        width: "100%",
+        //backgroundColor: "#e6e6e6",
+        paddingVertical: 10,
+        //paddingHorizontal: 10,
+        borderRadius: 0,
+    },
     screenContainer: {
         flex: 1,
         padding: 10,
@@ -134,9 +308,8 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     perfilTexto: {
+        textAlign: "left",
         fontSize: 18,
-        fontWeight: 'bold',
-        //textAlign: "left",
     },
     tituloTexto: {
         fontSize: 18,
@@ -163,5 +336,11 @@ const styles = StyleSheet.create({
     },
     buttonWrapper: {
         width: "95%", // Define a largura do contêiner do botão como 80% da tela
+    },
+    resultText: {
+        color: "#000000",
+        fontSize: 18,
+        marginTop: 20,
+        textAlign: "center",
     },
 });

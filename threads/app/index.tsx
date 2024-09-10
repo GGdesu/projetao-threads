@@ -1,4 +1,11 @@
-import { Text, View, StyleSheet, Image, Button, TouchableOpacity } from "react-native";
+import {
+    Text,
+    View,
+    StyleSheet,
+    Image,
+    Button,
+    TouchableOpacity,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
 
 export default function Index() {
@@ -17,7 +24,6 @@ export default function Index() {
                 <Text style={styles.textoEntrar}>Entrar</Text>
             </TouchableOpacity>
 
-            
             {/* <Link href='/cadastro' asChild>
       <TouchableOpacity style={styles.entrarB} >
         <Text style={styles.textoEntrar}>Entrar</Text>
