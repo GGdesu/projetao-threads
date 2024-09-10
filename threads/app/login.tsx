@@ -37,7 +37,9 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/react-logo.png')} />
+      <Image source={require("@/assets/iconPng/threads-logo.png")}
+        style={{ width: '90%', height: undefined, aspectRatio: 2035 / 449 }}
+        resizeMode="contain" />
       <Text style={styles.loginTexto}> Login </Text>
       <View style={styles.campoForm}>
         <Input

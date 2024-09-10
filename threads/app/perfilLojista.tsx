@@ -21,7 +21,7 @@ interface Shopkeeper {
 }
 
 // Importando a imagem de perfil localmente com caminho relativo
-const profilePicture = require('@/assets/images/shopkeeper.jpg');
+const profilePicture = require('@/assets/iconPng/shop_100x100.png');
 
 const ShopkeeperProfileScreen: React.FC = () => {
 
@@ -114,7 +114,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
         <Text style={styles.label}>CNPJ</Text>
         <Text style={styles.details}>{formatCnpj(user?.cnpj.toString())}</Text>
         <Text style={styles.label}>Endereço</Text>
-        <Text style={styles.details}>{user?.endereco}</Text>
+        <Text style={styles.details}>{`${user?.rua}, ${user?.numero}, ${user?.bairro}, ${user?.cidade}`}</Text>
         <Text style={styles.label}>Conta Bancária</Text>
         <Text style={styles.details}>{user?.conta_bancaria}</Text>
       </View>
@@ -187,9 +187,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   profilePicture: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 90,
+    height: 90,
+    borderRadius: 5,
   },
   name: {
     fontSize: 20,

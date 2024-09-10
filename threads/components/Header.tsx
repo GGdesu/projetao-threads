@@ -3,6 +3,9 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-na
 import { useRouter } from 'expo-router';
 import { useUser } from '@/context/userContext';
 
+const profilePictureLojista = require('@/assets/iconPng/shop_100x100.png');
+const profilePictureEntregador = require('@/assets/iconPng/motorcycle.png');
+
 
 const HeaderThreads: React.FC<HeaderProps> = ({ user: userParam }) => {
     const router = useRouter();
@@ -11,7 +14,7 @@ const HeaderThreads: React.FC<HeaderProps> = ({ user: userParam }) => {
 
     return (
         <View style={styles.header}>
-            <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
+            <Image style={styles.restauranteImage} source={user?.tipo_usuario === 1 ? profilePictureLojista : profilePictureEntregador} />
 
             <TouchableOpacity
                 onPress={() =>
@@ -32,8 +35,8 @@ const HeaderThreads: React.FC<HeaderProps> = ({ user: userParam }) => {
                                 : "Nome indisponível"}
                     </Text>
                     <Text style={styles.restauranteLocalizacao}>
-                        {userParam?.endereco
-                            ? userParam.endereco
+                        {userParam?.rua && userParam.bairro && userParam.cidade
+                            ? `${userParam.rua}, ${userParam.numero}, \n${userParam.bairro}, ${userParam.cidade}`
                             : "Endereço indisponível"}
                     </Text>
                 </View>
@@ -54,7 +57,7 @@ const styles = StyleSheet.create({
     restauranteImage: {
         width: 80,
         height: 80,
-        borderRadius: 40,
+        borderRadius: 5,
         marginRight: 20,
     },
     restauranteNome: {

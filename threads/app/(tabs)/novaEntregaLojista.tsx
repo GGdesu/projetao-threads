@@ -18,6 +18,7 @@ export default function logistaScreen() {
     const [tempoPreparo, setTempoPreparo] = useState("")
     const [tempoMax, setTempoMax] = useState("")
     const [endereco, setEndereco] = useState("")
+    
 
     const preco = 5
 

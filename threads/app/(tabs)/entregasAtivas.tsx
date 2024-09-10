@@ -9,6 +9,7 @@ import { getActiveUser, getActiveUserData } from '@/utils/supabaseUtils';
 import { Corrida, UserData } from '@/utils/dataInterface';
 import { FontAwesome } from '@expo/vector-icons';
 import { useUser } from '@/context/userContext';
+import HeaderThreads from '@/components/Header';
 
 
 
@@ -190,7 +191,7 @@ export default function TelaInicial() {
                 pathname: "/detalheAndamentoLojista",
                 params: { corridaID: item.id }
             })}>
-            <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} />
+            {/* <Image style={styles.entregadorImage} source={{ uri: 'https://via.placeholder.com/100' }} /> */}
             <View style={styles.cardInfo}>
                 <Text style={styles.entregadorNome}>Loja: <Text style={styles.boldText}>{item.nome_lojista}</Text></Text>
                 <Text style={styles.cardText}>Coleta: {item.coleta}</Text>
@@ -211,25 +212,7 @@ export default function TelaInicial() {
                 <View style={styles.container}>
                     {/* Cabeçalho do Restaurante */}
 
-                    <View style={styles.header}>
-
-                        <Image style={styles.restauranteImage} source={{ uri: 'https://via.placeholder.com/100' }} />
-                        <TouchableOpacity onPress={() => router.push({ pathname: "/pf_entregador_lojista" })}>
-                            <View>
-
-                                <Text style={styles.restauranteNome}>
-                                    {user && user?.tipo_usuario === 1 && user?.nome_loja
-                                        ? user.nome_loja
-                                        : user && user?.tipo_usuario === 2 && user?.nome
-                                            ? user.nome : "Nome indisponível"}
-                                </Text>
-
-                                <Text style={styles.restauranteLocalizacao}>{user && user?.endereco && user?.nome || user?.nome_loja
-                                    ? user.endereco
-                                    : "Endereço indisponivel"}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                    <HeaderThreads user={user} />
 
                     <Text style={{ textAlign: "center", marginVertical: 14, fontSize: 20, fontWeight: 'bold' }}>Corridas Em andamento</Text>
                     <Button title="Atualizar" onPress={atualizarCorridas} />

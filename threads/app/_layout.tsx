@@ -16,7 +16,6 @@ export default function RootLayout() {
         <Stack.Screen name="editarPerfilLojista"  options={{ title: "Editar Lojista" }} />
         <Stack.Screen name="perfilEntregador"  options={{ title: "Perfil" }} />
         <Stack.Screen name="editarPerfilEntregador"  options={{ title: "Editar Entregador" }} />
-        
       </Stack>
     </UserProvider>
 
