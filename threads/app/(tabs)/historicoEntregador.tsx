@@ -101,7 +101,7 @@ export default function historicoScreen() {
         >
           <Text style={styles.textBold}>Restaurante: {item.nome_lojista}</Text>
           <Text style={styles.textBold}>Valor da entrega: {item.preco}</Text>
-          <Text style={styles.textBold}>Atraso: {item.atraso} minutos</Text>
+          {/* <Text style={styles.textBold}>Atraso: {item.atraso} minutos</Text> */}
           <Text style={styles.textBold}>Clique para mais detalhes</Text>    
       </TouchableOpacity>
     );
@@ -148,7 +148,7 @@ export default function historicoScreen() {
                   <Text style={styles.modalHeader}>Detalhes da Entrega</Text>
                   <Text>Restaurante: {selectedEntrega.nome_lojista}</Text>
                   <Text>Valor da entrega: {selectedEntrega.preco}</Text>
-                  <Text>Atraso: {selectedEntrega.atraso} minutos</Text>
+                  {/* <Text>Atraso: {selectedEntrega.atraso} minutos</Text> */}
                   <Button title="Fechar" onPress={closeModal} />
                 </View>
               </View>

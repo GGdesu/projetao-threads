@@ -154,7 +154,7 @@ export default function DetalhesDaCorrida() {
                 <Text><Text style={styles.boldText}>Preço da corrida: R$</Text>{corrida.preco}</Text>
                 <Text><Text style={styles.boldText}>Solicitada:</Text> {formatarDataHoraISO(corrida.created_at)}</Text>
                 <Text><Text style={styles.boldText}>Coleta:</Text> {corrida.coleta}</Text>
-                <Text><Text style={styles.boldText}>Endereço de Entrega:</Text> {corrida.endereco_entrega}</Text>
+                <Text><Text style={styles.boldText}>Endereço de Entrega:</Text> {`${corrida.rua}, ${corrida.numero}, ${corrida.bairro}, ${corrida.cidade}`}</Text>
             </View>
 
             <View style={{ alignItems: 'center' }}>

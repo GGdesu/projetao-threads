@@ -10,8 +10,10 @@ interface Entrega {
   id: string;
   nome_entregador: string; 
   preco: number; 
-  endereco_entrega: string; 
-  avaliacao: number | null;   
+  rua: string;
+  numero: number;
+  bairro: string;
+  cidade: string;   
 }
 
 export default function historicoScreen() {
@@ -77,6 +79,7 @@ export default function historicoScreen() {
           const totalEntrega = data.reduce((acc, entrega) => acc + (entrega.tempo_entrega ? entrega.tempo_entrega : 0), 0);
           const avgEntrega = data.length > 0 ? totalEntrega / data.length : 0;
           setTempoMedioEntrega(avgEntrega);
+          
         }
       } catch (error) {
         console.error('Erro ao buscar histórico: ', error);
@@ -120,7 +123,7 @@ export default function historicoScreen() {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedEntrega(null);
-  };
+  };  
 
   const renderItem: ListRenderItem<Entrega> = ({ item }) => (
     <TouchableOpacity
@@ -129,8 +132,8 @@ export default function historicoScreen() {
     >
       <Text style={styles.textBold}>Entregador: {item.nome_entregador || 'Não disponível'}</Text>
       <Text style={styles.textBold}>Valor da entrega: R${item.preco ? item.preco.toFixed(2) : '0,00'}</Text>
-      <Text style={styles.textBold}>Endereço da entrega: {item.endereco_entrega || 'Endereço não disponível'}</Text>
-      <Text style={styles.textBold}>Avaliação da entrega: {item.avaliacao || 'Sem avaliação'}</Text>
+      <Text style={styles.textBold}>Endereço da entrega: {`${item.rua}, ${item.numero}, ${item.bairro}, ${item.cidade}` || 'Endereço não disponível'}</Text>
+      {/* <Text style={styles.textBold}>Avaliação da entrega: {item.avaliacao || 'Sem avaliação'}</Text> */}
       <Text style={styles.textBold}>Clique para mais detalhes</Text>
     </TouchableOpacity>
   );
@@ -147,18 +150,18 @@ export default function historicoScreen() {
             <Text style={{ fontWeight: 'bold' }}>Gastos Totais</Text>
             <Text>R${gastosTotais?.toFixed(2) || '0,00'}</Text>
           </View>
-          <View style={styles.infoBox}>
+          {/* <View style={styles.infoBox}>
             <Text style={{ fontWeight: 'bold' }}>Tempo médio de atraso</Text>
             <Text>{tempoMedioAtraso !== null ? `${Math.round(tempoMedioAtraso)} minutos` : '0 minutos'}</Text>
-          </View>
+          </View> */}
           <View style={styles.infoBox}>
             <Text style={{ fontWeight: 'bold' }}>Corridas Totais</Text>
             <Text>{corridasTotais || 0}</Text>
           </View>
-          <View style={styles.infoBox}>
+          {/* <View style={styles.infoBox}>
             <Text style={{ fontWeight: 'bold' }}>Tempo médio de entrega</Text>
             <Text>{tempoMedioEntrega !== null ? `${Math.round(tempoMedioEntrega)} minutos` : '0 minutos'}</Text>
-          </View>
+          </View> */}
         </View>
       </View>
       <View style={styles.linha} />
@@ -187,8 +190,8 @@ export default function historicoScreen() {
                 <Text style={styles.modalHeader}>Detalhes da Entrega</Text>
                 <Text>Entregador: {selectedEntrega.nome_entregador}</Text>
                 <Text>Valor da entrega: {selectedEntrega.preco}</Text>
-                <Text>Endereço da entrega: {selectedEntrega.endereco_entrega}</Text>
-                <Text>Avaliação da entrega: {selectedEntrega.avaliacao}</Text>
+                <Text>Endereço da entrega: {`${selectedEntrega.rua}, ${selectedEntrega.numero}, ${selectedEntrega.bairro}, ${selectedEntrega.cidade}`}</Text>
+                {/* <Text>Avaliação da entrega: {selectedEntrega.avaliacao}</Text> */}
                 <Button title="Fechar" onPress={closeModal} />
               </View>
             </View>
