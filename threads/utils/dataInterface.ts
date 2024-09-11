@@ -1,4 +1,3 @@
-
 export interface Corrida {
     id: string;
     created_at: string;
@@ -43,7 +42,7 @@ export interface UserData {
     cidade: string | null;
 }
 
-export interface UserContextProps{
+export interface UserContextProps {
     user: UserData | null;
     setUser: (user: UserData | null) => void;
     corridas: Corrida[] | null;
