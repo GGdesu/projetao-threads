@@ -5,6 +5,9 @@ import { useRouter } from "expo-router";
 import { supabase } from '@/utils/supabase';
 import HeaderThreads from "@/components/Header";
 import { useUser } from "@/context/userContext";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
+
 
 interface Entrega {
   id: string;
@@ -33,61 +36,62 @@ export default function historicoScreen() {
   const { user } = useUser();
 
 
-  useEffect(() => {
-    const fetchEntregasHistorico = async () => {
-      try {
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  useFocusEffect(
+    useCallback(() => {
+      const fetchEntregasHistorico = async () => {
+        try {
+          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
   
-        if (sessionError) {
-          throw sessionError;
+          if (sessionError) {
+            throw sessionError;
+          }
+  
+          const userId = sessionData.session?.user.id;
+  
+          if (!userId) {
+            console.error('Usuário não está logado');
+            return;
+          }
+  
+          // Consultando entregas do usuário logado
+          const { data, error } = await supabase
+            .from('entrega')
+            .select('*')
+            .eq('lojista_id', userId)
+            .eq('situacao_corrida', 'finalizada');
+  
+          if (error) {
+            throw error;
+          }
+  
+          if (data) {
+            setEntregas(data as Entrega[]);
+  
+            // Calcular gastos totais
+            const totalGastos = data.reduce((acc, entrega) => acc + (entrega.preco ? parseFloat(entrega.preco) : 0), 0);
+            setGastosTotais(totalGastos);
+  
+            // Calcular o tempo médio de atraso
+            const totalAtraso = data.reduce((acc, entrega) => acc + (entrega.tempo_atraso ? entrega.tempo_atraso : 0), 0);
+            const avgAtraso = data.length > 0 ? totalAtraso / data.length : 0;
+            setTempoMedioAtraso(avgAtraso);
+  
+            // Corridas totais
+            setCorridasTotais(data.length);
+  
+            // Tempo médio de entrega
+            const totalEntrega = data.reduce((acc, entrega) => acc + (entrega.tempo_entrega ? entrega.tempo_entrega : 0), 0);
+            const avgEntrega = data.length > 0 ? totalEntrega / data.length : 0;
+            setTempoMedioEntrega(avgEntrega);
+          }
+        } catch (error) {
+          console.error('Erro ao buscar histórico: ', error);
         }
+      };
   
-        const userId = sessionData.session?.user.id;
-  
-        if (!userId) {
-          console.error('Usuário não está logado');
-          return;
-        }
-  
-        // Consultando entregas do usuário logado
-        const { data, error } = await supabase
-          .from('entrega')
-          .select('*')
-          .eq('lojista_id', userId)
-          .eq('situacao_corrida', 'finalizada');
-  
-        if (error) {
-          throw error;
-        }
-  
-        if (data) {
-          setEntregas(data as Entrega[]);          
-  
-          // Calcular gastos totais
-          const totalGastos = data.reduce((acc, entrega) => acc + (entrega.preco ? parseFloat(entrega.preco) : 0), 0);
-          setGastosTotais(totalGastos);
-  
-          // Calcular o tempo médio de atraso
-          const totalAtraso = data.reduce((acc, entrega) => acc + (entrega.tempo_atraso ? entrega.tempo_atraso : 0), 0);
-          const avgAtraso = data.length > 0 ? totalAtraso / data.length : 0;
-          setTempoMedioAtraso(avgAtraso);
-  
-          // Corridas totais
-          setCorridasTotais(data.length);
-  
-          // Tempo médio de entrega
-          const totalEntrega = data.reduce((acc, entrega) => acc + (entrega.tempo_entrega ? entrega.tempo_entrega : 0), 0);
-          const avgEntrega = data.length > 0 ? totalEntrega / data.length : 0;
-          setTempoMedioEntrega(avgEntrega);
-          
-        }
-      } catch (error) {
-        console.error('Erro ao buscar histórico: ', error);
-      }
-    };
-  
-    fetchEntregasHistorico();
-  }, []);
+      fetchEntregasHistorico();
+    }, [])
+  );
   
 
   useEffect(() => {
