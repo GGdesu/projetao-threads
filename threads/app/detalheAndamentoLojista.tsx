@@ -103,8 +103,7 @@ export default function DetalhesDaCorrida() {
                     setCorridas(userCorrida)
                 }
             }
-    
-            console.log("tentou pegar as corridas")
+            
     
         } catch (error) {
             console.log("erro na função getCorridas: ", error)
@@ -152,14 +151,15 @@ export default function DetalhesDaCorrida() {
 
             {/* Seção de Informações da Corrida */}
             <View style={styles.infoContainer}>
-                <Text><Text style={styles.boldText}>Preço da corrida: R$</Text>{corrida.preco}</Text>
+                <Text><Text style={styles.boldText}>Preço da corrida: R$</Text>{corrida.preco?.toFixed(2)}</Text>
                 <Text><Text style={styles.boldText}>Solicitada:</Text> {formatarDataHoraISO(corrida.created_at)}</Text>
                 <Text><Text style={styles.boldText}>Coleta:</Text> {corrida.coleta}</Text>
-                <Text><Text style={styles.boldText}>Endereço de Entrega:</Text> {corrida.endereco_entrega}</Text>
+                <Text><Text style={styles.boldText}>Endereço de Entrega:</Text> {`${corrida.rua}, ${corrida.numero}, ${corrida.bairro}, ${corrida.cidade}`}</Text>
             </View>
 
             <View style={{ alignItems: 'center' }}>
-                <Button
+                {user?.tipo_usuario === 2 && ( // Verifica se o tipo de usuário é 2
+                    <Button
                     title="Finalizar Corrida"
                     onPress={handleFinalizarCorrida}
                     disabled={disable}
@@ -171,15 +171,13 @@ export default function DetalhesDaCorrida() {
                         height: 40,
                         width: '90%',
                         marginHorizontal: 10,
-                        //marginVertical: 0,
-
-
                     }}
                     titleStyle={{
                         color: 'white',
                         marginHorizontal: 20,
                     }}
-                />
+                    />
+                )}
                 <Button
                     title="Cancelar Corrida"
                     onPress={handleCancelarCorrida}

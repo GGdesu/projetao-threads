@@ -94,8 +94,6 @@ export default function CorridasEmAndamento() {
                 }
             }
 
-            console.log("tentou pegar as corridas")
-
         } catch (error) {
             console.log("erro na função getCorridas: ", error)
             return null

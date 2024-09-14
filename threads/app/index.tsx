@@ -1,4 +1,11 @@
-import { Text, View, StyleSheet, Image, Button, TouchableOpacity } from "react-native";
+import {
+    Text,
+    View,
+    StyleSheet,
+    Image,
+    Button,
+    TouchableOpacity,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
 
 export default function Index() {
@@ -6,8 +13,15 @@ export default function Index() {
 
     return (
         <View style={styles.container}>
-            <Image source={require("@/assets/images/react-logo.png")} />
-            <Text style={styles.texto}>Threads</Text>
+            <Image
+                source={require("@/assets/iconPng/threads-logo.png")}
+                style={{
+                    width: "90%",
+                    height: undefined,
+                    aspectRatio: 2035 / 449,
+                }}
+                resizeMode="contain"
+            />
             <Text style={styles.textoNegrito}>Otimizando Suas Entregas</Text>
 
             <TouchableOpacity
@@ -17,7 +31,6 @@ export default function Index() {
                 <Text style={styles.textoEntrar}>Entrar</Text>
             </TouchableOpacity>
 
-            
             {/* <Link href='/cadastro' asChild>
       <TouchableOpacity style={styles.entrarB} >
         <Text style={styles.textoEntrar}>Entrar</Text>
