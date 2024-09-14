@@ -158,7 +158,8 @@ export default function DetalhesDaCorrida() {
             </View>
 
             <View style={{ alignItems: 'center' }}>
-                <Button
+                {user?.tipo_usuario === 2 && ( // Verifica se o tipo de usuário é 2
+                    <Button
                     title="Finalizar Corrida"
                     onPress={handleFinalizarCorrida}
                     disabled={disable}
@@ -170,15 +171,13 @@ export default function DetalhesDaCorrida() {
                         height: 40,
                         width: '90%',
                         marginHorizontal: 10,
-                        //marginVertical: 0,
-
-
                     }}
                     titleStyle={{
                         color: 'white',
                         marginHorizontal: 20,
                     }}
-                />
+                    />
+                )}
                 <Button
                     title="Cancelar Corrida"
                     onPress={handleCancelarCorrida}

@@ -5,6 +5,8 @@ import { useRouter } from "expo-router";
 import { supabase } from '@/utils/supabase';
 import HeaderThreads from "@/components/Header";
 import { useUser } from "@/context/userContext";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 interface Entrega {
   id: string;
@@ -28,61 +30,62 @@ export default function historicoScreen() {
 
     const { user } = useUser();
     
-
-    useEffect(() => {
-      const fetchEntregas = async () => {
-        try {
-          // Obtendo o usuário logado
-          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    
-          if (sessionError) {
-            throw sessionError;
+    useFocusEffect(
+      useCallback(() => {
+        const fetchEntregas = async () => {
+          try {
+            // Obtendo o usuário logado
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+            if (sessionError) {
+              throw sessionError;
+            }
+      
+            const userId = sessionData?.session?.user?.id; // Obtendo o ID do usuário logado
+      
+            if (!userId) {
+              console.error('Usuário não está logado');
+              return;
+            }
+      
+            // Buscando entregas do entregador logado
+            const { data, error } = await supabase
+              .from('entrega') // Nome da tabela
+              .select('*')
+              .eq('entregador_id', userId)
+              .eq('situacao_corrida', 'finalizada');
+      
+            if (error) {
+              throw error;
+            }
+      
+            if (data) {
+              setEntregas(data as Entrega[]);
+      
+              // Calcular faturamento, verificando se `valor` é válido
+              const totalFaturamento = data.reduce((acc, entrega) => {
+                const valor = parseFloat(entrega.preco);
+                return acc + (isNaN(valor) ? 0 : valor);
+              }, 0);
+              setFaturamento(totalFaturamento);
+      
+              // Número total de entregas
+              setNumeroEntregas(data.length);
+            } else {
+              // Lidar com o caso onde `data` é `null` ou `undefined` sem definir valores padrão
+              setEntregas([]);
+              setFaturamento(0);
+              setNumeroEntregas(0);
+            }
+      
+          } catch (error) {
+            console.error('Erro ao buscar entregas:', error);
           }
-    
-          const userId = sessionData?.session?.user?.id; // Obtendo o ID do usuário logado
-    
-          if (!userId) {
-            console.error('Usuário não está logado');
-            return;
-          }
-    
-          // Buscando entregas do entregador logado
-          const { data, error } = await supabase
-            .from('entrega') // Nome da tabela
-            .select('*')
-            .eq('entregador_id', userId)
-            .eq('situacao_corrida', 'finalizada');
-    
-          if (error) {
-            throw error;
-          }
-    
-          if (data) {
-            setEntregas(data as Entrega[]);
-    
-            // Calcular faturamento, verificando se `valor` é válido
-            const totalFaturamento = data.reduce((acc, entrega) => {
-              const valor = parseFloat(entrega.preco);
-              return acc + (isNaN(valor) ? 0 : valor);
-            }, 0);
-            setFaturamento(totalFaturamento);
-    
-            // Número total de entregas
-            setNumeroEntregas(data.length);
-          } else {
-            // Lidar com o caso onde `data` é `null` ou `undefined` sem definir valores padrão
-            setEntregas([]);
-            setFaturamento(0);
-            setNumeroEntregas(0);
-          }
-    
-        } catch (error) {
-          console.error('Erro ao buscar entregas:', error);
-        }
-      };
-    
-      fetchEntregas();
-    }, []);
+        };
+      
+        fetchEntregas();
+      }, [])
+    );
 
     const handlePressItem = (entrega: Entrega) => {
       setSelectedEntrega(entrega);

@@ -186,7 +186,7 @@ export default function TelaInicial() {
     const renderCorrida = ({ item }: { item: Corrida }) => (
         <TouchableOpacity
             key={item.id}  // Usar o ID da corrida como chave, que é único
-            style={[styles.card, item.atrasada && styles.cardAtrasada]}
+            style={[styles.card, styles.cardAtrasada]}
             onPress={() => router.push({
                 pathname: "/detalheAndamentoLojista",
                 params: { corridaID: item.id }
