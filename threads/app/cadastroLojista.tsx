@@ -19,6 +19,10 @@ export default function cadastroScreen() {
     const [contaBancaria, setContaBancaria] = useState("");
     const [rg, setRg] = useState("");
     const [dataNascimento, setDataNascimento] = useState("");
+    const [rua, setRua] = useState("");
+    const [numero, setNumero] = useState("");
+    const [bairro, setBairro] = useState("");
+    const [cidade, setCidade] = useState("");
 
     // Certificar de que o email e a senha sejam strings
     const emailString = Array.isArray(email) ? email[0] : email;
@@ -73,9 +77,13 @@ export default function cadastroScreen() {
                         tipo_usuario: 1,
                         nome_loja: nomeLoja,
                         cnpj: parseInt(cnpj),
-                        endereco: endereco,
+                        // endereco: endereco,
                         telefone: parseInt(telefone),
                         conta_bancaria: parseInt(contaBancaria),
+                        rua,
+                        numero,
+                        bairro,
+                        cidade,
                     }
                 ])
 
@@ -123,14 +131,64 @@ export default function cadastroScreen() {
                     maxLength={18}
                     value={formatCnpj(cnpj)}
                 />
-                <Input
+                <View style={styles.containerHorizontal}>
+                    <Input
+                        labelStyle={styles.labelForm}
+                        placeholder="Informe o nome da rua"
+                        inputStyle={[styles.inputLabel, { width: "40%" }]}
+                        containerStyle={
+                            (styles.inputContainer, { width: "50%" })
+                        }
+                        value={rua}
+                        onChangeText={setRua}
+                        label="Nome da rua"
+                    />
+                    <Input
+                        placeholder="Informe o número da casa"
+                        labelStyle={styles.labelForm}                        
+                        inputStyle={[styles.inputLabel, { width: "40%" }]}
+                        containerStyle={
+                            (styles.inputContainer, { width: "50%" })
+                        }
+                        label="Número"
+                        value={numero}
+                        onChangeText={setNumero}
+                        keyboardType="numeric" // Define o teclado numérico
+                    />
+                </View>
+                <View style={styles.containerHorizontal}>
+                    <Input
+                        placeholder="Informe o nome do bairro"
+                        labelStyle={styles.labelForm}
+                        inputStyle={[styles.inputLabel, { width: "40%" }]}
+                        containerStyle={
+                            (styles.inputContainer, { width: "50%" })
+                        }
+                        label="Bairro"
+                        value={bairro}
+                        onChangeText={setBairro}
+                    />
+                    <Input
+                        placeholder="Informe o nome da cidade"
+                        inputStyle={styles.inputLabel}
+                        labelStyle={styles.labelForm}
+                        containerStyle={
+                            (styles.inputContainer, { width: "50%" })
+                        }
+                        label="Cidade"
+                        value={cidade}
+                        onChangeText={setCidade}
+                    />
+                </View>
+                {/* <Input
                     placeholder="Informe seu Endereço"
                     inputStyle={styles.inputLabel}
                     label="Endereço"
                     labelStyle={styles.labelForm}
                     onChangeText={handleEnderecoChange}
                     value={endereco}
-                />
+                /> */}
+
                 <Input
                     placeholder="Informe seu Telefone"
                     inputStyle={styles.inputLabel}
@@ -195,7 +253,7 @@ const styles = StyleSheet.create({
     inputLabel: {
         lineHeight: 16,
         textAlign: "left",
-        color: "#b3b3b3",
+        color: "#FFFFFF",
     },
     containerForm: {
         padding: 5,
@@ -204,5 +262,22 @@ const styles = StyleSheet.create({
         color: "#000",
         fontSize: 16,
         //backgroundColor: Color.colorBlack,
+    },
+    inputTexto: {
+        color: "808080",
+        fontSize: 16,
+    },
+    inputContainer: {
+        marginTop: 20,
+        width: "100%",
+    },
+    containerHorizontal: {
+        flexDirection: "row",
+        //alignItems: "center",
+        width: "100%",
+        //backgroundColor: "#e6e6e6",
+        paddingVertical: 10,
+        //paddingHorizontal: 10,
+        borderRadius: 0,
     },
 });
