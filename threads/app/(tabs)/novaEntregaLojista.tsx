@@ -214,7 +214,7 @@ export default function logistaScreen() {
             setNumero("");
             setRua("");
         } catch (error) {
-            setErrorMesage(" ERRO AO FAZER A ENTREGA");
+            console.error("Erro ao fazer a entrega:", error);
         }
     };
 
