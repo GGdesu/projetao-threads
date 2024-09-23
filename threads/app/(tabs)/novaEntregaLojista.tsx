@@ -38,7 +38,6 @@ export default function logistaScreen() {
     //infos do usuario pegas atraves do context
     const [errorMesage, setErrorMesage] = useState("");
     const { user } = useUser();
-    const [coleta, setColeta] = useState("");
     const [distance, setDistance] = useState(0);
     const [tempoDePreparo, setTempoDePreparo] = useState("");
     const [rua, setRua] = useState("");
@@ -54,7 +53,7 @@ export default function logistaScreen() {
 
     // Função para enviar os dados ao Supabase
 
-    async function enviarDadosParaSupabase() {
+    async function enviarDadosParaSupabase(dist: number, dataHoraColeta: string) {
         try {
             const { error: upsertError } = await supabase
                 .from("entrega")
@@ -63,14 +62,14 @@ export default function logistaScreen() {
                     numero,
                     bairro,
                     cidade,
-                    coleta,
+                    coleta: dataHoraColeta,
                     lojista_id: user?.lojista_id,
                     created_at: getCurrentDateTime(),
                     nome_lojista: user?.nome_loja,
                     telefone_lojista: user?.telefone,
                     tempo_preparo: tempoDePreparo,
                     previsao_entrega: calcularHorarioEntrega(
-                        calcularTempoDeEntrega(distance!, tempoDePreparo)
+                        calcularTempoDeEntrega(dist, tempoDePreparo)
                     ),
                     situacao_corrida: "ativa",
                     preco: calcularValorDaEntrega(),
@@ -108,14 +107,14 @@ export default function logistaScreen() {
             const agora = new Date();
             const horas = agora.getHours().toString().padStart(2, "0");
             const minutos = agora.getMinutes().toString().padStart(2, "0");
-            setColeta(`${horas}:${minutos}`);
+            const dataHoraColeta = `${horas}:${minutos}`;
 
-            if (distance == 0) {
+            if (dist == 0) {
                 throw new Error("Distância não pôde ser calculada, Endereço errado !");
             }
 
             // Após calcular a distância, envia os dados para o Supabase
-            await enviarDadosParaSupabase();
+            await enviarDadosParaSupabase(dist, dataHoraColeta);
 
             setBairro("");
             setCidade("");
@@ -126,8 +125,7 @@ export default function logistaScreen() {
 
             setErrorMesage("");
         } catch (error) {
-            console.log(error);
-            setErrorMesage("Erro ao criar entrega. Tente novamente");
+            console.log("Erro ao fazer a entrega:", error);
         }
     };
 

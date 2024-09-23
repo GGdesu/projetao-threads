@@ -15,7 +15,6 @@ import { useFocusEffect } from '@react-navigation/native';
 export default function CorridasEmAndamento() {
     const router = useRouter()
     const [filtro, setFiltro] = useState('Todas');
-    const [userId, setUserId] = useState("");
 
     //pegando a informação do usuario atravez do contexto
     const { user, setUser } = useUser()
@@ -35,6 +34,11 @@ export default function CorridasEmAndamento() {
         getUser();
     }, [])
 
+    useFocusEffect(
+        useCallback(() => {
+            getCorridas();
+        }, [])
+    )
     //pegar Entregas
     useEffect(() => {
         getCorridas()
