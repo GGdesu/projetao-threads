@@ -1,4 +1,5 @@
 import { useUser } from "@/context/userContext";
+import { TabActions } from "@react-navigation/native";
 import { Tabs } from "expo-router";
 import { title } from "process";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"

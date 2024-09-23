@@ -1,7 +1,7 @@
 import { supabase } from '@/utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import LoginScreen from '@/app/login';
 import { useUser } from '@/context/userContext';
@@ -9,11 +9,13 @@ import { getActiveUserData, getDelivers } from '@/utils/supabaseUtils';
 import HeaderThreads from '@/components/Header';
 import { Corrida } from '@/utils/dataInterface';
 import moment from 'moment';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function CorridasEmAndamento() {
     const router = useRouter()
     const [filtro, setFiltro] = useState('Todas');
+    const [userId, setUserId] = useState("");
 
     //pegando a informação do usuario atravez do contexto
     const { user, setUser } = useUser()
@@ -30,9 +32,7 @@ export default function CorridasEmAndamento() {
             setSession(session)
         })
 
-        getUser()
-
-
+        getUser();
     }, [])
 
     //pegar Entregas

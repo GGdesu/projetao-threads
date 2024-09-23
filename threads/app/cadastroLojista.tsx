@@ -3,10 +3,11 @@ import { Button, Input } from "@rneui/base";
 import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/utils/supabase";
-import { formatCnpj } from "@/utils/mask";
+import { formatCnpj, formatPhoneNumber, formatCep } from "@/utils/mask";
+import { getAddressByCep } from "@/utils/viaCep";
+import { Address } from "@/utils/dataInterface";
 
 export default function cadastroScreen() {
-    const [value, setValue] = useState("");
     const router = useRouter();
     const { email, password } = useLocalSearchParams();
     //const [loading, setLoading] = useState(false)
@@ -17,12 +18,11 @@ export default function cadastroScreen() {
     const [endereco, setEndereco] = useState("")
     const [telefone, setTelefone] = useState("")
     const [contaBancaria, setContaBancaria] = useState("");
-    const [rg, setRg] = useState("");
-    const [dataNascimento, setDataNascimento] = useState("");
     const [rua, setRua] = useState("");
     const [numero, setNumero] = useState("");
     const [bairro, setBairro] = useState("");
     const [cidade, setCidade] = useState("");
+    const [cep, setCep] = useState("");
 
     // Certificar de que o email e a senha sejam strings
     const emailString = Array.isArray(email) ? email[0] : email;
@@ -37,10 +37,6 @@ export default function cadastroScreen() {
         setCnpj(numericValue);
     };
 
-    const handleEnderecoChange = (text: string) => {
-        setEndereco(text);
-    };
-
     const handleTelefoneChange = (text: string) => {
         const numericValue = text.replace(/[^0-9]/g, '');
         setTelefone(numericValue);
@@ -49,6 +45,22 @@ export default function cadastroScreen() {
     const handleContaBancariaChange = (text: string) => {
         const numericValue = text.replace(/[^0-9]/g, '');
         setContaBancaria(numericValue);
+    };
+
+    const handleAddress = async () => {
+        console.log("consultando cep...");
+        const numericValue = cep.replace(/[^0-9]/g, '');
+        const data: Address = await getAddressByCep(numericValue);
+
+        if (!data.logradouro || !data.bairro || !data.localidade) {
+            setRua("");
+            setBairro("");
+            setCidade("");
+        } else {
+            setRua(data.logradouro);
+            setBairro(data.bairro);
+            setCidade(data.localidade);
+        }
     };
 
     async function signUpWithEmail() {
@@ -77,7 +89,6 @@ export default function cadastroScreen() {
                         tipo_usuario: 1,
                         nome_loja: nomeLoja,
                         cnpj: parseInt(cnpj),
-                        // endereco: endereco,
                         telefone: parseInt(telefone),
                         conta_bancaria: parseInt(contaBancaria),
                         rua,
@@ -89,7 +100,7 @@ export default function cadastroScreen() {
 
             if (insertError) {
                 Alert.alert('Erro ao salvar informações adicionais:', insertError.message)
-            }else{
+            } else {
                 Alert.alert("informaçoes salvas, por favor faça login")
                 router.navigate("/login")
             }
@@ -107,115 +118,101 @@ export default function cadastroScreen() {
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <View>
             <Text style={styles.cadastroTexto}> Cadastro Lojista </Text>
             <Text style={styles.informe}>
                 Informe os seus dados {"\n"}para prosseguir com o cadastro
             </Text>
-            <View style={styles.campoForm}>
-                <Input
-                    placeholder="Informe o nome da loja"
-                    inputStyle={styles.inputLabel}
-                    label="Nome do estabelecimento"
-                    labelStyle={styles.labelForm}
-                    onChangeText={handleNomeLojaChange}
-                    value={nomeLoja}
-                />
-                <Input
-                    placeholder="Informe seu CNPJ"
-                    inputStyle={styles.inputLabel}
-                    keyboardType="numeric"
-                    label="CNPJ"
-                    labelStyle={styles.labelForm}
-                    onChangeText={handleCnpjChange}
-                    maxLength={18}
-                    value={formatCnpj(cnpj)}
-                />
-                <View style={styles.containerHorizontal}>
+            <ScrollView style= {{maxHeight: 650}} contentContainerStyle={styles.scrollView}>
+                <View style={styles.campoForm}>
                     <Input
-                        labelStyle={styles.labelForm}
-                        placeholder="Informe o nome da rua"
-                        inputStyle={[styles.inputLabel, { width: "40%" }]}
-                        containerStyle={
-                            (styles.inputContainer, { width: "50%" })
-                        }
-                        value={rua}
-                        onChangeText={setRua}
-                        label="Nome da rua"
-                    />
-                    <Input
-                        placeholder="Informe o número da casa"
-                        labelStyle={styles.labelForm}                        
-                        inputStyle={[styles.inputLabel, { width: "40%" }]}
-                        containerStyle={
-                            (styles.inputContainer, { width: "50%" })
-                        }
-                        label="Número"
-                        value={numero}
-                        onChangeText={setNumero}
-                        keyboardType="numeric" // Define o teclado numérico
-                    />
-                </View>
-                <View style={styles.containerHorizontal}>
-                    <Input
-                        placeholder="Informe o nome do bairro"
-                        labelStyle={styles.labelForm}
-                        inputStyle={[styles.inputLabel, { width: "40%" }]}
-                        containerStyle={
-                            (styles.inputContainer, { width: "50%" })
-                        }
-                        label="Bairro"
-                        value={bairro}
-                        onChangeText={setBairro}
-                    />
-                    <Input
-                        placeholder="Informe o nome da cidade"
+                        placeholder="Informe o nome da loja"
                         inputStyle={styles.inputLabel}
+                        label="Nome do estabelecimento"
                         labelStyle={styles.labelForm}
+                        onChangeText={handleNomeLojaChange}
+                        value={nomeLoja}
+                    />
+                    <Input
+                        placeholder="00.000.000/0000-00"
+                        inputStyle={styles.inputLabel}
+                        keyboardType="numeric"
+                        label="CNPJ"
+                        labelStyle={styles.labelForm}
+                        onChangeText={handleCnpjChange}
+                        maxLength={18}
+                        value={formatCnpj(cnpj)}
+                    />
+                    <View style={styles.containerHorizontal}>
+                        <Input
+                            label="Cep"
+                            labelStyle={styles.labelForm}
+                            placeholder="50.000-000"
+                            inputStyle={[styles.inputLabel, { width: "40%" }]}
+                            containerStyle={
+                                (styles.inputContainer, { width: "50%" })
+                            }
+                            onChangeText={setCep}
+                            onBlur={handleAddress}
+                            maxLength={10}
+                            value={formatCep(cep)}
+                            keyboardType="numeric"
+                        />
+                        <Input
+                            placeholder=""
+                            labelStyle={styles.labelForm}
+                            inputStyle={[styles.inputLabel, { width: "40%" }]}
+                            containerStyle={
+                                (styles.inputContainer, { width: "50%" })
+                            }
+                            label="Número"
+                            maxLength={5}
+                            value={numero}
+                            onChangeText={setNumero}
+                            keyboardType="numeric" // Define o teclado numérico
+                        />
+                    </View>
+                    <Input
+                        labelStyle={styles.labelForm}
+                        placeholder="Rua, Bairro, Cidade"
+                        inputStyle={[styles.inputLabel, { width: "40%" }]}
                         containerStyle={
-                            (styles.inputContainer, { width: "50%" })
+                            (styles.inputContainer)
                         }
-                        label="Cidade"
-                        value={cidade}
-                        onChangeText={setCidade}
+                        value={rua != "" ? `${rua}, ${bairro}, ${cidade}` : ""}
+                        onChangeText={setRua}
+                        label="Endereço"
+                        readOnly
+                    />
+                    <Input
+                        placeholder="Informe seu Telefone"
+                        inputStyle={styles.inputLabel}
+                        keyboardType="numeric"
+                        label="Telefone"
+                        labelStyle={styles.labelForm}
+                        onChangeText={handleTelefoneChange}
+                        maxLength={15}
+                        value={formatPhoneNumber(telefone)}
+                    />
+                    <Input
+                        placeholder="Informe sua Conta Bancaria"
+                        inputStyle={styles.inputLabel}
+                        label="Conta Bancária"
+                        labelStyle={styles.labelForm}
+                        onChangeText={handleContaBancariaChange}
+                        value={contaBancaria}
+                    />
+                    <Button
+                        //disabled={loading}
+                        title={"Finalizar Cadastro"}
+                        onPress={() => signUpWithEmail()}
+                        titleStyle={styles.titleEntregador}
+                        buttonStyle={{ backgroundColor: "#fff", borderRadius: 5 }}
+                        containerStyle={styles.containerForm}
                     />
                 </View>
-                {/* <Input
-                    placeholder="Informe seu Endereço"
-                    inputStyle={styles.inputLabel}
-                    label="Endereço"
-                    labelStyle={styles.labelForm}
-                    onChangeText={handleEnderecoChange}
-                    value={endereco}
-                /> */}
-
-                <Input
-                    placeholder="Informe seu Telefone"
-                    inputStyle={styles.inputLabel}
-                    keyboardType="numeric"
-                    label="Telefone"
-                    labelStyle={styles.labelForm}
-                    onChangeText={handleTelefoneChange}
-                    value={telefone}
-                />
-                <Input
-                    placeholder="Informe sua Conta Bancaria"
-                    inputStyle={styles.inputLabel}
-                    label="Conta Bancária"
-                    labelStyle={styles.labelForm}
-                    onChangeText={handleContaBancariaChange}
-                    value={contaBancaria}
-                />
-                <Button
-                    //disabled={loading}
-                    title={"Finalizar Cadastro"}
-                    onPress={() => signUpWithEmail()}
-                    titleStyle={styles.titleEntregador}
-                    buttonStyle={{ backgroundColor: "#fff", borderRadius: 5 }}
-                    containerStyle={styles.containerForm}
-                />
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 }
 
@@ -223,12 +220,14 @@ const styles = StyleSheet.create({
     scrollView: {
         flexGrow: 1,
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "center"
     },
     cadastroTexto: {
         color: "#000",
         fontSize: 30,
         fontWeight: "600",
+        textAlign: "center",
+        marginTop: 70
     },
     informe: {
         fontSize: 16,
@@ -268,7 +267,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     inputContainer: {
-        marginTop: 20,
+        marginTop: 10,
         width: "100%",
     },
     containerHorizontal: {

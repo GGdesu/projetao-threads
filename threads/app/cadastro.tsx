@@ -10,14 +10,15 @@ export default function cadastroScreen() {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-    const handleInputChange = (text: string) => {
-        const numericValue = text.replace(/[^0-9]/g, "");
-        setValue(numericValue);
-    };
+  const handleInputChange = (text: string) => {
+    const numericValue = text.replace(/[^0-9]/g, "");
+    setValue(numericValue);
+  };
 
   // Função de validação de email
   const validateEmail = (text: string) => {
@@ -25,10 +26,10 @@ export default function cadastroScreen() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(text)) {
       setEmailError('Email inválido');
-      
+
     } else {
       setEmailError('');
-      
+
     }
   };
 
@@ -47,28 +48,14 @@ export default function cadastroScreen() {
   };
 
   const comparePassword = (text: string) => {
+    setConfirmPassword(text);
+
     if (password != text) {
       setPasswordError('A senha não está igual')
     } else {
       setPasswordError('')
     }
   }
-
-  // async function signUpWithEmail() {
-  //   setLoading(true)
-
-  //   const {
-  //     data: { session },
-  //     error,
-  //   } = await supabase.auth.signUp({
-  //     email: email,
-  //     password: password,
-  //   })
-
-  //   if (error) Alert.alert(error.message)
-  //   if (!session) Alert.alert("Por favor, Cheque sua caixa de entrada no email, para verificação.")
-  //   setLoading(false)
-  // }
 
   return (
     <View style={styles.container}>
@@ -108,11 +95,14 @@ export default function cadastroScreen() {
 
         <Button title={'Cadastrar como Lojista'}
           disabled={loading}
-          //onPress={() => signUpWithEmail()}
-          onPress={() => router.push({
-            pathname: "/cadastroLojista",
-            params: {email, password}
-          })}
+          onPress={() => {
+            if (email && password && confirmPassword && !passwordError) {
+              router.push({
+                pathname: "/cadastroLojista",
+                params: { email, password }
+              })
+            }
+          }}
           titleStyle={styles.titleLojista}
           buttonStyle={{ backgroundColor: '#808080', borderRadius: 5 }}
           containerStyle={styles.containerForm} />
@@ -120,9 +110,8 @@ export default function cadastroScreen() {
           disabled={loading}
           onPress={() => router.push({
             pathname: "/cadastroEntregador",
-            params: {email, password}
+            params: { email, password }
           })}
-          //onPress={() => signUpWithEmail()} //criação de email
           titleStyle={styles.titleEntregador}
           buttonStyle={{ backgroundColor: '#fff', borderRadius: 5 }}
           containerStyle={styles.containerForm} />
@@ -132,52 +121,52 @@ export default function cadastroScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    cadastroTexto: {
-        color: "#000",
-        fontSize: 30,
-        fontWeight: "600",
-    },
-    informe: {
-        fontSize: 16,
-        color: "#808080",
-        textAlign: "center",
-        marginBottom: 20,
-    },
-    campoForm: {
-        width: "90%",
-        backgroundColor: "#000",
-        paddingVertical: 30,
-        paddingHorizontal: 10,
-        borderRadius: 10,
-    },
-    labelForm: {
-        color: "#b3b3b3",
-        textAlign: "left",
-        fontSize: 16,
-        lineHeight: 22,
-        width: "100%",
-    },
-    inputLabel: {
-        lineHeight: 16,
-        textAlign: "left",
-        color: "#b3b3b3",
-    },
-    titleLojista: {
-        fontSize: 16,
-        color: "#fff",
-    },
-    containerForm: {
-        padding: 5,
-    },
-    titleEntregador: {
-        color: "#000",
-        fontSize: 16,
-        //backgroundColor: Color.colorBlack,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cadastroTexto: {
+    color: "#000",
+    fontSize: 30,
+    fontWeight: "600",
+  },
+  informe: {
+    fontSize: 16,
+    color: "#808080",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  campoForm: {
+    width: "90%",
+    backgroundColor: "#000",
+    paddingVertical: 30,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  labelForm: {
+    color: "#b3b3b3",
+    textAlign: "left",
+    fontSize: 16,
+    lineHeight: 22,
+    width: "100%",
+  },
+  inputLabel: {
+    lineHeight: 16,
+    textAlign: "left",
+    color: "#b3b3b3",
+  },
+  titleLojista: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  containerForm: {
+    padding: 5,
+  },
+  titleEntregador: {
+    color: "#000",
+    fontSize: 16,
+    //backgroundColor: Color.colorBlack,
+  },
 });

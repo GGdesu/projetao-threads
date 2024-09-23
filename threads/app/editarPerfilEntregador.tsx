@@ -4,11 +4,14 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useUser } from "@/context/userContext";
 import { supabase } from "@/utils/supabase";
+import { formatDate, formatPhoneNumber } from "@/utils/mask";
 
 export default function perfilEntregadorScreen() {
 
     const { user, setUser } = useUser()
     const router = useRouter();
+
+    console.log(user);
 
     //pegar infos do entregador
     const [nome, setNome] = useState(user?.nome || "")
@@ -114,7 +117,7 @@ export default function perfilEntregadorScreen() {
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Nome</Text>
                     <Input
-                        placeholder={"nome usuário"}
+                        placeholder={user?.nome ? user.nome : nome}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         onChangeText={handleNomeChange}
@@ -125,19 +128,19 @@ export default function perfilEntregadorScreen() {
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Telefone</Text>
                     <Input
-                        placeholder="(81) 99999-9999"
+                        placeholder={user?.telefone ? formatPhoneNumber(user.telefone.toString()) : telefone}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         keyboardType="numeric"
                         onChangeText={handleTelefoneChange}
-                        value={telefone}
+                        value={formatPhoneNumber(telefone)}
                     />
                 </View>
 
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>CNH</Text>
                     <Input
-                        placeholder="xxxxxxxxx"
+                        placeholder="cnh"//{user?.cnh ? user.cnh : cnh}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         onChangeText={handleCnhChange}
@@ -149,7 +152,7 @@ export default function perfilEntregadorScreen() {
                     <Text style={styles.labelAboveInput}>Endereço</Text>
                     <View style={styles.containerHorizontal}>
                         <Input
-                            placeholder="Informe o nome da rua"
+                            placeholder={user?.rua ? user.rua : rua}
                             inputStyle={(styles.inputTexto, { width: "40%" })}
                             containerStyle={
                                 (styles.inputContainer, { width: "50%" })
@@ -159,7 +162,7 @@ export default function perfilEntregadorScreen() {
                             label="Nome da rua"
                         />
                         <Input
-                            placeholder="Informe o numero da casa"
+                            placeholder={user?.numero ? user.numero.toString() : numero}
                             inputStyle={(styles.inputTexto, { width: "40%" })}
                             containerStyle={
                                 (styles.inputContainer, { width: "50%" })
@@ -171,7 +174,7 @@ export default function perfilEntregadorScreen() {
                     </View>
                     <View style={styles.containerHorizontal}>
                         <Input
-                            placeholder="Informe o nome do bairro"
+                            placeholder={user?.bairro ? user.bairro : bairro}
                             inputStyle={(styles.inputTexto, { width: "40%" })}
                             containerStyle={
                                 (styles.inputContainer, { width: "50%" })
@@ -181,7 +184,7 @@ export default function perfilEntregadorScreen() {
                             onChangeText={setBairro}
                         />
                         <Input
-                            placeholder="Informe o nome da cidade"
+                            placeholder={user?.cidade ? user.cidade : cidade}
                             inputStyle={styles.inputTexto}
                             containerStyle={
                                 (styles.inputContainer, { width: "50%" })
@@ -196,18 +199,18 @@ export default function perfilEntregadorScreen() {
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Data de nascimento</Text>
                     <Input
-                        placeholder={"Data de Nascimento"}
+                        placeholder={user?.data_nascimento ? formatDate(user.data_nascimento) : formatDate(dataNascimento)}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         onChangeText={handleDataNascimentoChange}
-                        value={dataNascimento}
+                        value={formatDate(dataNascimento)}
                     />
                 </View>
 
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>RG</Text>
                     <Input
-                        placeholder={"Digite o RG"}
+                        placeholder="rg"
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         keyboardType="numeric"
@@ -219,7 +222,7 @@ export default function perfilEntregadorScreen() {
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Veiculo</Text>
                     <Input
-                        placeholder={"Digite o nome do veiculo"}
+                        placeholder={user?.veiculo ? user.veiculo : veiculo}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         onChangeText={handleVeiculoChange}
@@ -230,7 +233,7 @@ export default function perfilEntregadorScreen() {
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Conta Bancaria</Text>
                     <Input
-                        placeholder="xxxxx-x"
+                        placeholder={user?.conta_bancaria ? user.conta_bancaria.toString() : contaBancaria}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         onChangeText={handleContaBancariaChange}

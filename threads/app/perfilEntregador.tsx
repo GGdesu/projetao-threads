@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } fr
 import { Button } from '@rneui/themed';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'expo-router';
+import { formatDate, formatPhoneNumber } from '@/utils/mask';
 
 
 
@@ -16,20 +17,6 @@ const ShopkeeperProfileScreen: React.FC = () => {
   const [email, setEmail] = useState("")
 
   const router = useRouter();
-
-  // const shopkeeper: Shopkeeper = {
-  //   id: '1',
-  //   name: 'Maria Souza',
-  //   email: 'maria.souza@lojista.com',
-  //   phone: '(11) 91234-5678',
-  //   storeName: 'Loja da Maria',
-  //   profilePicture: profilePicture,
-  //   cnpj: '12.345.678/0001-99',
-  //   address: 'Rua das Flores, 123, São Paulo, SP',
-  //   bankAccount: 'Banco XYZ - Ag: 1234 - C/C: 56789-0',
-  //   deliveries: 120,
-  //   totalSpent: 'R$ 4.500,00',
-  // };
 
   const handleEditProfile = () => {
     router.navigate("/editarPerfilEntregador")
@@ -86,7 +73,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
         <Text style={styles.label}>Email</Text>
         <Text style={styles.info}>{email}</Text>
         <Text style={styles.label}>Telefone</Text>
-        <Text style={styles.info}>{user?.telefone}</Text>
+        <Text style={styles.info}>{formatPhoneNumber(user?.telefone.toString())}</Text>
       </View>
 
       <View style={styles.divider} />
@@ -96,7 +83,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
         <Text style={styles.label}>RG</Text>
         <Text style={styles.details}>{user?.rg}</Text>
         <Text style={styles.label}>Data de nascimento</Text>
-        <Text style={styles.details}>{user?.data_nascimento}</Text>
+        <Text style={styles.details}>{formatDate(user?.data_nascimento?.toString())}</Text>
         <Text style={styles.label}>CNH</Text>
         <Text style={styles.details}>{user?.cnh}</Text>
         <Text style={styles.label}>Endereço</Text>

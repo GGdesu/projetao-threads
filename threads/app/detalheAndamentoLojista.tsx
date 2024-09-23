@@ -1,4 +1,5 @@
 import { useUser } from '@/context/userContext';
+import { formatPhoneNumber } from '@/utils/mask';
 import { formatarDataHoraISO } from '@/utils/misc';
 import { getDelivers, updateDeliverSituation } from '@/utils/supabaseUtils';
 import { FontAwesome } from '@expo/vector-icons';
@@ -139,7 +140,7 @@ export default function DetalhesDaCorrida() {
                 <View style={styles.delivererInfo}>
                     <Text>{user?.tipo_usuario === 1 ? "Entregador: " : "Restaurante"}<Text style={styles.delivererName}></Text>{user?.tipo_usuario === 1 ? corrida.nome_entregador : user?.nome_loja}</Text>
                     <TouchableOpacity onPress={() => Linking.openURL(`tel:${user?.telefone}`)}>
-                        <Text>Telefone: <Text style={styles.delivererPhone}>{user?.telefone}</Text></Text>
+                        <Text>Telefone: <Text style={styles.delivererPhone}>{formatPhoneNumber(user?.telefone.toString())}</Text></Text>
                     </TouchableOpacity>
 
                     <Text>{user?.tipo_usuario === 2 ? renderStars(5) : ""}</Text>{/* Substitua por um componente de avaliação real */}
@@ -222,6 +223,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#fff',
+        marginTop: 40
     },
     header: {
         flexDirection: 'row',

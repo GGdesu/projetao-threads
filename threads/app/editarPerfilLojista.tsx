@@ -3,8 +3,10 @@ import { Button, Input } from "@rneui/base";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useUser } from "@/context/userContext";
-import { formatCnpj } from "@/utils/mask";
+import { formatCep, formatCnpj, formatPhoneNumber } from "@/utils/mask";
 import { supabase } from "@/utils/supabase";
+import { getAddressByCep } from "@/utils/viaCep";
+import { Address } from "@/utils/dataInterface";
 
 
 export default function PerfilLogistaScreen() {
@@ -22,6 +24,7 @@ export default function PerfilLogistaScreen() {
     const [numero, setNumero] = useState("");
     const [bairro, setBairro] = useState("");
     const [cidade, setCidade] = useState("");
+    const [cep, setCep] = useState("");
 
     const handleNomeLojaChange = (text: string) => {
         setNomeLoja(text);
@@ -46,12 +49,28 @@ export default function PerfilLogistaScreen() {
         setContaBancaria(numericValue);
     };
 
+    const handleAddress = async () => {
+        console.log("consultando cep...");
+        const numericValue = cep.replace(/[^0-9]/g, '');
+        const data: Address = await getAddressByCep(numericValue);
+
+        if (!data.logradouro || !data.bairro || !data.localidade) {
+            setRua("");
+            setBairro("");
+            setCidade("");
+        } else {
+            setRua(data.logradouro);
+            setBairro(data.bairro);
+            setCidade(data.localidade);
+        }
+    };
+
     async function updateProfileLojista() {
 
         try {
 
             // Se o cadastro foi bem-sucedido, salvar as informações adicionais
-            const { data: userUpdate , error: insertError } = await supabase
+            const { data: userUpdate, error: insertError } = await supabase
                 .from('usuario')
                 .update([
                     {
@@ -72,7 +91,7 @@ export default function PerfilLogistaScreen() {
 
             if (insertError) {
                 Alert.alert('Erro ao salvar informações adicionais:', insertError.message)
-            }else{
+            } else {
                 Alert.alert("informaçoes atualizadas")
                 //console.log("usuario atualizado: ", userUpdate[0])
                 setUser(userUpdate[0])
@@ -95,7 +114,7 @@ export default function PerfilLogistaScreen() {
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Nome do Restaurante</Text>
                     <Input
-                        placeholder={user?.nome_loja ? user.nome_loja : "nome do restaurante"}
+                        placeholder={user?.nome_loja ? user.nome_loja : nomeLoja}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         onChangeText={handleNomeLojaChange}
@@ -106,20 +125,20 @@ export default function PerfilLogistaScreen() {
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Telefone</Text>
                     <Input
-                        placeholder="(81) 99999-9999"
+                        placeholder={user?.telefone ? formatPhoneNumber(user.telefone.toString()) : formatPhoneNumber(telefone)}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         keyboardType="numeric"
                         onChangeText={handleTelefoneChange}
-                        value={telefone}
-
+                        maxLength={15}
+                        value={formatPhoneNumber(telefone)}
                     />
                 </View>
 
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>CNPJ</Text>
                     <Input
-                        placeholder="xx.xxx.xxx/xxxx-xx"
+                        placeholder={user?.cnpj ? formatCnpj(user.cnpj.toString()) : formatCnpj(cnpj)}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         onChangeText={handleCnpjChange}
@@ -132,54 +151,47 @@ export default function PerfilLogistaScreen() {
                     <Text style={styles.labelAboveInput}>Endereço</Text>
                     <View style={styles.containerHorizontal}>
                         <Input
-                            placeholder="Informe o nome da rua"
-                            inputStyle={(styles.inputTexto, { width: "40%" })}
+                            label="Cep"
+                            placeholder="xx.xxx-xxx"
+                            inputStyle={[styles.inputLabel, { width: "40%" }]}
                             containerStyle={
                                 (styles.inputContainer, { width: "50%" })
                             }
-                            value={rua}
-                            onChangeText={setRua}
-                            label="Nome da rua"
+                            onChangeText={setCep}
+                            onBlur={handleAddress}
+                            maxLength={10}
+                            value={formatCep(cep)}
+                            keyboardType="numeric"
                         />
                         <Input
-                            placeholder="Informe o numero da casa"
-                            inputStyle={(styles.inputTexto, { width: "40%" })}
+                            placeholder=""
+                            inputStyle={[styles.inputLabel, { width: "40%" }]}
                             containerStyle={
                                 (styles.inputContainer, { width: "50%" })
                             }
-                            label="Numero"
-                            value={numero}
+                            label="Número"
+                            maxLength={5}
+                            value={user?.numero ? user.numero.toString() : numero}
                             onChangeText={setNumero}
+                            keyboardType="numeric" // Define o teclado numérico
                         />
                     </View>
-                    <View style={styles.containerHorizontal}>
-                        <Input
-                            placeholder="Informe o nome do bairro"
-                            inputStyle={(styles.inputTexto, { width: "40%" })}
-                            containerStyle={
-                                (styles.inputContainer, { width: "50%" })
-                            }
-                            label="Bairro"
-                            value={bairro}
-                            onChangeText={setBairro}
-                        />
-                        <Input
-                            placeholder="Informe o nome da cidade"
-                            inputStyle={styles.inputTexto}
-                            containerStyle={
-                                (styles.inputContainer, { width: "50%" })
-                            }
-                            label="Cidade"
-                            value={cidade}
-                            onChangeText={setCidade}
-                        />
-                    </View>
+                    <Input
+                        placeholder={rua != "" ? `${rua}, ${bairro}, ${cidade}` : `${user?.rua}, ${user?.bairro}, ${user?.cidade}`}
+                        inputStyle={[styles.inputLabel, { width: "40%" }]}
+                        containerStyle={
+                            (styles.inputContainer)
+                        }
+                        value={rua != "" ? `${rua}, ${bairro}, ${cidade}` : ""}
+                        label="Endereço"
+                        readOnly
+                    />
                 </View>
 
                 <View style={styles.inputPading}>
                     <Text style={styles.labelAboveInput}>Conta bancaria</Text>
                     <Input
-                        placeholder="xxxxx-x"
+                        placeholder={user?.conta_bancaria ? user.conta_bancaria.toString() : contaBancaria}
                         inputStyle={styles.inputLabel}
                         containerStyle={styles.inputContainerStyle} // Aplicando o contorno
                         onChangeText={handleContaBancariaChange}

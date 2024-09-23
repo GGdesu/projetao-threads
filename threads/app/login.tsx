@@ -14,8 +14,8 @@ export default function LoginScreen() {
     try {
       setLoading(true)
       const { error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
+        email: "paulo@email.com",
+        password: "teste123",
       })
 
       if (error) {

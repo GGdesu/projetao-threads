@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } fr
 import { Button } from '@rneui/themed';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'expo-router';
-import { formatCnpj } from '@/utils/mask';
+import { formatCnpj, formatPhoneNumber } from '@/utils/mask';
 
 interface Shopkeeper {
   id: string;
@@ -56,7 +56,6 @@ const ShopkeeperProfileScreen: React.FC = () => {
     //console.log(user)
   
     if (error) {
-      console.error('Erro ao pegar o usuário:', error);
       return;
     }
     
@@ -75,10 +74,24 @@ const ShopkeeperProfileScreen: React.FC = () => {
   }
 
   async function handleLogOut() {
-   
 
-    const {error} = await supabase.auth.signOut()
+    Alert.alert("Deseja realmente sair?", "Para confirmar, pressione 'sim'.", [
+      {
+        text: 'Não',
+        onPress: () => {},
+        style: "cancel"
+      },
+      {
+        text: 'Sim',
+        onPress: () => logout(),
+      }
+    ])
     
+  }
+
+  const logout = async () => {
+   
+    const {error} = await supabase.auth.signOut()
 
     if(error){
       Alert.alert("Erro ao desconectar: ", error.message)
@@ -87,7 +100,6 @@ const ShopkeeperProfileScreen: React.FC = () => {
       Alert.alert("Sucesso", "Voce foi desconectado!")
       router.navigate('/')
     }
-    
   }
 
   
@@ -104,7 +116,7 @@ const ShopkeeperProfileScreen: React.FC = () => {
         <Text style={styles.label}>Email</Text>
         <Text style={styles.info}>{email}</Text>
         <Text style={styles.label}>Telefone</Text>
-        <Text style={styles.info}>{user?.telefone}</Text>
+        <Text style={styles.info}>{formatPhoneNumber(user?.telefone.toString())}</Text>
       </View>
 
       <View style={styles.divider} />
